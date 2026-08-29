@@ -1,27 +1,26 @@
 # 当前状态
 
-- **阶段**：R 正式测试（每类 1e4）已跑完
-- **工作区**：`D:\project\Python\EEG`
+- **阶段**：方案 B 已落地，并用 R（rp+se）试跑完成
+- **协议**：每条记录先按时间 0.7/0.15/0.15 切 train/val/test，段内 `stride=window=256` 不重叠采窗；val early-stop，test 最终报告
 
-## 正式结果（default，1w/类）
+## 方案 B + R 结果（`config/b_r.yaml`）
 
-- 样本：5 × 10000 = 50000；train 40000 / test 10000
-- 方法：rp + se；窗长 256；RP 64×64；CUDA
-- **best_val_acc ≈ 0.7859**（约第 8 epoch）；early stop 于 epoch 16
-- 产物：`datas/rp_images/`、`datas/checkpoints/best_rp_cnn.pt`
+- 样本：train 36868 / val 7898 / test 7898
+- **best_val_acc ≈ 0.798**；**test_acc ≈ 0.777**
+- 模型：`datas/checkpoints_B_r/best_rp_cnn_B.pt`
 
-## 对照
+## 对照（旧协议有泄漏，仅历史参考）
 
-| 每类样本 | best_val_acc |
-|----------|--------------|
-| 40 (smoke) | ~0.47 |
-| 1000 | ~0.57 |
-| **10000** | **~0.79** |
+| 协议 | 设置 | 指标 |
+|------|------|------|
+| 旧 | R 1w 窗级随机 split | val≈0.79（不可信） |
+| 旧 | M 1w | val≈0.88（不可信） |
+| **B** | R 时间切分+不重叠 | **test≈0.78**（更干净） |
 
 ## 待办
 
-- [ ] 阶段 M：MRP + additive
-- [ ] 论文对齐 / 涨点 / Web / 独立 venv
+- [ ] 可选：同一协议跑 M（`mrp+additive`）
+- [ ] commit 方案 B 改动
 
 ## 阻塞
 

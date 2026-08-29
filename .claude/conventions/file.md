@@ -7,7 +7,10 @@ EEG/
 ├── .claude/                 # AI 上下文（见 CLAUDE.md）
 ├── config/
 │   ├── default.yaml         # 正式默认（R）
-│   └── smoke.yaml           # 冒烟小配置
+│   ├── smoke.yaml           # 冒烟小配置
+│   ├── b_r.yaml             # 方案 B + 阶段 R 试跑
+│   ├── m_1k.yaml            # 阶段 M：每类 1k（旧协议，仅对照）
+│   └── m_1w.yaml            # 阶段 M：每类 1w（旧协议，仅对照）
 ├── data/
 │   ├── dataset.py           # 读 raw、窗采样
 │   └── __init__.py

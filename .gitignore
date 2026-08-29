@@ -5,8 +5,14 @@ __pycache__/
 .mypy_cache/
 datas/rp_images/
 datas/rp_images_smoke/
+datas/rp_images_B/
+datas/mrp_images_1k/
+datas/mrp_images_1w/
 datas/checkpoints/
 datas/checkpoints_smoke/
+datas/checkpoints_m_1k/
+datas/checkpoints_m_1w/
+datas/checkpoints_B_r/
 *.pt
 *.pth
 .DS_Store

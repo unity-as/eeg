@@ -1,4 +1,4 @@
-"""注意力模块：none / se（阶段 R）；additive（阶段 M 占位）。"""
+"""注意力模块：none / se（阶段 R）；additive（阶段 M）。"""
 from __future__ import annotations
 
 import torch
@@ -31,6 +31,24 @@ class SEAttention(nn.Module):
         return x * w
 
 
+class AdditiveAttention(nn.Module):
+    """Bahdanau 式加性空间注意力（用于 CNN 特征图）。
+
+    score = v^T tanh(W x)，再对空间维 softmax，得到注意力图。
+    """
+
+    def __init__(self, channels: int):
+        super().__init__()
+        self.W = nn.Conv2d(channels, channels, kernel_size=1, bias=True)
+        self.v = nn.Conv2d(channels, 1, kernel_size=1, bias=False)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        e = self.v(torch.tanh(self.W(x)))
+        b, _, h, w = e.shape
+        alpha = torch.softmax(e.view(b, -1), dim=1).view(b, 1, h, w)
+        return x * alpha
+
+
 def build_attention(kind: str, channels: int) -> nn.Module:
     k = str(kind).lower()
     if k in ("none", "identity", "off"):
@@ -38,7 +56,5 @@ def build_attention(kind: str, channels: int) -> nn.Module:
     if k == "se":
         return SEAttention(channels)
     if k == "additive":
-        raise NotImplementedError(
-            "method.attention=additive 属于阶段 M，尚未实现。请使用 none 或 se。"
-        )
+        return AdditiveAttention(channels)
     raise ValueError(f"未知 attention: {kind}")

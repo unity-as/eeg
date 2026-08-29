@@ -17,3 +17,14 @@
 
 - `num_windows_per_class=10000`；best_val_acc≈0.7859；early stop @16
 - checkpoint 覆盖写入 `datas/checkpoints/best_rp_cnn.pt`
+
+### 阶段 M：MRP + additive
+
+- 实现 soft MRP + AdditiveAttention；配置 `m_1k.yaml` / `m_1w.yaml`
+- 修复 raw `(N,1)` 被误判多通道的问题
+- M-1k best_val_acc≈0.7461；M-1w best_val_acc≈0.8849
+
+### 方案 B：时间切分 + 不重叠窗
+
+- 重写 `data/dataset.py`、step1/step2；配置 `config/b_r.yaml`
+- R 试跑：best_val≈0.798，**test_acc≈0.777**（train/val/test=36868/7898/7898）

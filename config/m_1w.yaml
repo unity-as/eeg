@@ -1,0 +1,43 @@
+# ==================== 阶段 M：MRP + additive（每类 1w） ====================
+method:
+  representation: mrp
+  attention: additive
+  rhythm_filter: false
+  quality_assess: false
+  embedding_dim: 3
+  time_delay: 1
+  recurrence_percentile: 0.1
+  epsilon: null
+  rp_image_size: 64
+
+data:
+  source: rotating
+  raw_data_dir: "D:/project/Python/rotating_machinery_diagnosis/datas/raw_datas"
+  cache_dir: "./datas/mrp_images_1w"
+  class_map:
+    normal: 0
+    inner: 1
+    outer: 2
+    combine: 3
+    roll: 4
+  window_size: 256
+  num_windows_per_class: 10000
+  test_ratio: 0.2
+  random_state: 42
+
+train:
+  batch_size: 32
+  epochs: 30
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  early_stop_patience: 8
+  num_workers: 0
+  device: "cuda"
+  checkpoint_dir: "./datas/checkpoints_m_1w"
+  save_best_model: "best_mrp_cnn.pt"
+  seed: 42
+
+output:
+  run_tsne: false
+  plot_curve: true
