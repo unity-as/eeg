@@ -1,0 +1,43 @@
+# ==================== smoke：快速验证 R 通路 ====================
+method:
+  representation: rp
+  attention: se
+  rhythm_filter: false
+  quality_assess: false
+  embedding_dim: 3
+  time_delay: 1
+  recurrence_percentile: 0.1
+  epsilon: null
+  rp_image_size: 64
+
+data:
+  source: rotating
+  raw_data_dir: "D:/project/Python/rotating_machinery_diagnosis/datas/raw_datas"
+  cache_dir: "./datas/rp_images_smoke"
+  class_map:
+    normal: 0
+    inner: 1
+    outer: 2
+    combine: 3
+    roll: 4
+  window_size: 128
+  num_windows_per_class: 40
+  test_ratio: 0.25
+  random_state: 42
+
+train:
+  batch_size: 16
+  epochs: 8
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  early_stop_patience: 5
+  num_workers: 0
+  device: "cuda"
+  checkpoint_dir: "./datas/checkpoints_smoke"
+  save_best_model: "best_rp_cnn_smoke.pt"
+  seed: 42
+
+output:
+  run_tsne: false
+  plot_curve: true
