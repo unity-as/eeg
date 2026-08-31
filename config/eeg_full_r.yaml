@@ -1,0 +1,44 @@
+# EEG 大规模（2 被试全 run）：R
+method:
+  representation: rp
+  attention: se
+  rhythm_filter: false
+  quality_assess: false
+  embedding_dim: 3
+  time_delay: 1
+  recurrence_percentile: 0.1
+  epsilon: null
+  rp_image_size: 64
+
+data:
+  source: ds002680
+  bids_root: "./datas/ds002680"
+  cache_dir: "./datas/eeg_cache_full_r"
+  subjects: [sub-002, sub-003, sub-004, sub-005, sub-006, sub-007, sub-008, sub-009, sub-010, sub-011, sub-012, sub-013, sub-014, sub-015]
+  train_subjects: [sub-002, sub-003, sub-004, sub-005, sub-006, sub-007, sub-008, sub-009, sub-010, sub-011]
+  val_subjects: [sub-012, sub-013]
+  test_subjects: [sub-014, sub-015]
+  epoch_samples: 256
+  # 不限制 runs/epochs
+  class_map:
+    cat_go: 0
+    cat_nogo: 1
+    rec_go: 2
+    rec_nogo: 3
+
+train:
+  batch_size: 32
+  epochs: 30
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  early_stop_patience: 8
+  num_workers: 0
+  device: "cuda"
+  checkpoint_dir: "./datas/checkpoints_eeg_full_r"
+  save_best_model: "best_eeg_r.pt"
+  seed: 42
+
+output:
+  run_tsne: false
+  plot_curve: true

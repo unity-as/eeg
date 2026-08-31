@@ -1,27 +1,32 @@
 # 当前状态
 
-- **阶段**：方案 B 已落地，并用 R（rp+se）试跑完成
-- **协议**：每条记录先按时间 0.7/0.15/0.15 切 train/val/test，段内 `stride=window=256` 不重叠采窗；val early-stop，test 最终报告
+- **定位**：个体内 Go-nogo 四分类；方法为可配置 RP/MRP+CNN（见 `doc/goal.md`）
+- **数据**：`datas/ds002680/`（14 被试；当前批次 `sub-002`）
+- **窗长**：已锁定 **`epoch_samples=512`**
+- **相空间**：`embed_select=fixed`，m=3，**τ=12**；**z-score 保持开**（论文1，不关）；M 多导 `joint`；节律默认关
+- 旋转机械残余已删；无参入口 `config/eeg_ws_r.yaml`
 
-## 方案 B + R 结果（`config/b_r.yaml`）
+## 2-Fold LOSO（已结束，不作主线）
 
-- 样本：train 36868 / val 7898 / test 7898
-- **best_val_acc ≈ 0.798**；**test_acc ≈ 0.777**
-- 模型：`datas/checkpoints_B_r/best_rp_cnn_B.pt`
+- 正式 R 均值 0.209；报告：`doc/individual_focus_report.md`
 
-## 对照（旧协议有泄漏，仅历史参考）
+## 当前：个体内 sub-002，512 ms，1500 窗
 
-| 协议 | 设置 | 指标 |
-|------|------|------|
-| 旧 | R 1w 窗级随机 split | val≈0.79（不可信） |
-| 旧 | M 1w | val≈0.88（不可信） |
-| **B** | R 时间切分+不重叠 | **test≈0.78**（更干净） |
+工程默认（τ=1，无 z-score，M 每导一张）：R **0.803** / M **0.734**（对照，不改回）。
+
+论文向（z-score；M=joint）：
+
+| | τ=12 | τ=1 |
+|--|--|--|
+| R | **0.749** | 0.718 |
+| M | **0.552** | 0.475 |
+
+开 z-score 后 R 低于工程默认约 5 点；不关。尺度变了，后面在 **z-score 仍开** 的前提下改 ε / 训练。M 掉分主因 joint，同样只记录。  
+数字：`doc/within_subject_sub002_results.md`。
 
 ## 待办
 
-- [ ] 可选：同一协议跑 M（`mrp+additive`）
-- [ ] commit 方案 B 改动
-
-## 阻塞
-
-无
+- [ ] 在 z-score + τ=12 下改其它参数（先 ε：`std` / 分位；再 `lr`）
+- [ ] 缓存/权重路径带上 τ，避免对照覆盖
+- [ ] 需要时换 `sub-003`
+- [ ] commit

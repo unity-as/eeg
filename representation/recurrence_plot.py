@@ -4,16 +4,10 @@ from __future__ import annotations
 from typing import Optional, Tuple
 
 import numpy as np
-from PIL import Image
 
 from .phase_space import build_phase_space
-
-
-def _pairwise_distances(traj: np.ndarray) -> np.ndarray:
-    # ||a-b||^2 = |a|^2 + |b|^2 - 2 a·b
-    sq = np.sum(traj * traj, axis=1, keepdims=True)
-    d2 = np.maximum(sq + sq.T - 2.0 * (traj @ traj.T), 0.0)
-    return np.sqrt(d2)
+from .rp_core import pairwise_distances, resolve_epsilon, resize_square, zscore_channels
+from .rhythm import apply_rhythm_filter
 
 
 def build_recurrence_plot(
@@ -23,47 +17,81 @@ def build_recurrence_plot(
     epsilon: Optional[float] = None,
     recurrence_percentile: float = 0.1,
     image_size: Optional[int] = 64,
+    epsilon_mode: str = "percentile",
+    std_k: float = 0.25,
+    diameter_frac: float = 0.1,
 ) -> np.ndarray:
     traj = build_phase_space(signal, m=m, tau=tau)
-    dist = _pairwise_distances(traj)
-    if epsilon is None:
-        # 上三角（不含对角）分位数作阈值
-        iu = np.triu_indices_from(dist, k=1)
-        eps = float(np.quantile(dist[iu], recurrence_percentile))
-    else:
-        eps = float(epsilon)
+    dist = pairwise_distances(traj)
+    eps = resolve_epsilon(
+        dist,
+        epsilon=epsilon,
+        mode=epsilon_mode,
+        percentile=recurrence_percentile,
+        std_k=std_k,
+        diameter_frac=diameter_frac,
+    )
     rp = (dist <= eps).astype(np.float32)
-    if image_size is not None and (rp.shape[0] != image_size or rp.shape[1] != image_size):
-        img = Image.fromarray((rp * 255.0).astype(np.uint8), mode="L")
-        img = img.resize((image_size, image_size), resample=Image.BILINEAR)
-        rp = np.asarray(img, dtype=np.float32) / 255.0
-    return rp
+    return resize_square(rp, image_size)
 
 
-def build_representation(signal: np.ndarray, method_cfg) -> Tuple[np.ndarray, dict]:
-    """按配置构建二维表示；mrp 阶段未实现则报错。"""
+def _preprocess(arr: np.ndarray, method_cfg) -> np.ndarray:
+    fs = method_cfg.get("sampling_rate", None)
+    if fs is None:
+        fs = 1000.0
+    arr = apply_rhythm_filter(
+        arr,
+        enabled=bool(method_cfg.get("rhythm_filter", False)),
+        fs=float(fs),
+        band=method_cfg.get("rhythm_band", "delta"),
+    )
+    if str(method_cfg.get("normalize", "zscore")).lower() in ("zscore", "z", "std"):
+        arr = zscore_channels(arr)
+    return arr
+
+
+def _build_1d(signal: np.ndarray, method_cfg) -> np.ndarray:
     kind = str(method_cfg.representation).lower()
-    meta = {}
-
     if kind == "rp":
         eps = method_cfg.get("epsilon", None)
-        rp = build_recurrence_plot(
+        return build_recurrence_plot(
             signal,
             m=int(method_cfg.embedding_dim),
             tau=int(method_cfg.time_delay),
             epsilon=None if eps in (None, "null") else float(eps),
-            recurrence_percentile=float(method_cfg.recurrence_percentile),
+            recurrence_percentile=float(method_cfg.get("recurrence_percentile", 0.1)),
             image_size=int(method_cfg.rp_image_size),
+            epsilon_mode=str(method_cfg.get("epsilon_mode", "percentile")),
+            std_k=float(method_cfg.get("epsilon_std_k", 0.25)),
+            diameter_frac=float(method_cfg.get("diameter_frac", 0.1)),
         )
-    elif kind == "mrp":
+    if kind == "mrp":
         from .modified_rp import build_modified_rp
 
-        rp = build_modified_rp(signal, method_cfg)
+        return build_modified_rp(signal, method_cfg)
+    raise ValueError(f"未知 representation: {kind}")
+
+
+def build_representation(signal: np.ndarray, method_cfg) -> Tuple[np.ndarray, dict]:
+    """1D → [H,W]；多通道 RP → [C,H,W]；多通道 MRP-joint → [H,W]。"""
+    arr = np.asarray(signal, dtype=np.float64)
+    arr = np.squeeze(arr)
+    arr = _preprocess(arr, method_cfg)
+    meta = {}
+    kind = str(method_cfg.representation).lower()
+    if arr.ndim == 1:
+        rp = _build_1d(arr, method_cfg)
+    elif arr.ndim == 2:
+        if kind == "mrp":
+            rp = _build_1d(arr, method_cfg)
+        else:
+            maps = [_build_1d(arr[c], method_cfg) for c in range(arr.shape[0])]
+            rp = np.stack(maps, axis=0).astype(np.float32)
     else:
-        raise ValueError(f"未知 representation: {kind}")
+        raise ValueError(f"表示输入须为 1D 或 [C,T]，收到 {arr.shape}")
 
     if bool(method_cfg.get("quality_assess", False)):
         from .quality import assess_rp_quality
 
-        meta["quality"] = assess_rp_quality(rp)
+        meta["quality"] = assess_rp_quality(rp if rp.ndim == 2 else np.mean(rp, axis=0))
     return rp, meta

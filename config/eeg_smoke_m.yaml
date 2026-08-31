@@ -1,0 +1,45 @@
+# EEG ds002680 链路冒烟：M（mrp+additive），2 被试
+method:
+  representation: mrp
+  attention: additive
+  rhythm_filter: false
+  quality_assess: false
+  embedding_dim: 3
+  time_delay: 1
+  recurrence_percentile: 0.1
+  epsilon: null
+  rp_image_size: 64
+
+data:
+  source: ds002680
+  bids_root: "./datas/ds002680"
+  cache_dir: "./datas/eeg_cache_smoke_m"
+  subjects: [sub-002, sub-003, sub-004]
+  train_subjects: [sub-002]
+  val_subjects: [sub-003]
+  test_subjects: [sub-004]
+  epoch_samples: 256
+  max_runs_per_subject: 2
+  max_epochs_per_subject: 200
+  class_map:
+    cat_go: 0
+    cat_nogo: 1
+    rec_go: 2
+    rec_nogo: 3
+
+train:
+  batch_size: 16
+  epochs: 5
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  early_stop_patience: 3
+  num_workers: 0
+  device: "cuda"
+  checkpoint_dir: "./datas/checkpoints_eeg_smoke_m"
+  save_best_model: "best_eeg_m_smoke.pt"
+  seed: 42
+
+output:
+  run_tsne: false
+  plot_curve: true

@@ -2,7 +2,7 @@
 
 ## 项目背景
 
-基于三篇 RP/MRP + CNN（可加注意力）的 EEG 癫痫相关论文，在**单一工程**内用配置切换方法变体。当前优先用旋转机械振动 `raw_datas` 做五分类工程验证，再分阶段补论文向对齐。代码流水线对照 `D:\project\Python\rotating_machinery_diagnosis`；`.claude/` 职责对照 `infantry_main/.claude`。
+基于三篇 RP/MRP + CNN（可加注意力）的 EEG 论文，在**单一工程**内用配置切换方法变体。当前任务是 OpenNeuro **ds002680** 上的 **个体内** Go-nogo 四分类。`.claude/` 职责对照 `infantry_main/.claude`。
 
 ## 目录导航（.claude/）
 
@@ -17,10 +17,10 @@
 
 ## 方法配置（摘要）
 
-详见 `config/default.yaml` 与 `.claude/docs/architecture.md`。
+详见 `config/eeg_ws_r.yaml` 与 `.claude/docs/architecture.md`。
 
 - **阶段 R（当前）**：`representation=rp`，`attention=se`（或 `none`），`rhythm_filter=false`
-- **阶段 M（后续）**：`representation=mrp`，`attention=additive`
+- **阶段 M（对照）**：`representation=mrp`，`attention=additive`
 - 论文 1 选参/质量评估、节律滤波：模块可插拔，默认关
 
 ## 红线

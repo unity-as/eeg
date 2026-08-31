@@ -1,0 +1,48 @@
+# 多通道 RP + SE；每被试最多 200 个 epoch；训练最多 200 轮
+method:
+  representation: rp
+  attention: se
+  rhythm_filter: false
+  quality_assess: false
+  embedding_dim: 3
+  time_delay: 1
+  recurrence_percentile: 0.1
+  epsilon: null
+  rp_image_size: 64
+
+data:
+  source: ds002680
+  bids_root: "./datas/ds002680"
+  cache_dir: "./datas/eeg_cache_mch_r"
+  subjects: [sub-002, sub-003, sub-004, sub-005, sub-006, sub-007, sub-008, sub-009, sub-010, sub-011, sub-012, sub-013, sub-014, sub-015]
+  # 按被试切分（约 10/2/2 ≈ 71%/14%/14%），三集互不重叠；禁止把同一人同时放进 val 和 test
+  train_subjects: [sub-002, sub-003, sub-004, sub-005, sub-006, sub-007, sub-008, sub-009, sub-010, sub-011]
+  val_subjects: [sub-012, sub-013]
+  test_subjects: [sub-014, sub-015]
+  epoch_samples: 256
+  max_epochs_per_subject: 200
+  class_map:
+    cat_go: 0
+    cat_nogo: 1
+    rec_go: 2
+    rec_nogo: 3
+
+train:
+  batch_size: 16
+  epochs: 200
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  augment: true                 # false 则关闭全部数据增强
+  gaussian_std: 0.05
+  channel_dropout: 0.2
+  early_stop_patience: 30
+  num_workers: 0
+  device: "cuda"
+  checkpoint_dir: "./datas/checkpoints_eeg_mch_r"
+  save_best_model: "best_eeg_mch_r.pt"
+  seed: 42
+
+output:
+  run_tsne: false
+  plot_curve: true

@@ -1,0 +1,67 @@
+# 个体内冒烟 M
+method:
+  representation: mrp
+  attention: additive
+  rhythm_filter: false
+  rhythm_band: delta
+  quality_assess: false
+  embed_select: fixed
+  embedding_dim: 3
+  time_delay: 12
+  epsilon_mode: percentile
+  recurrence_percentile: 0.1
+  epsilon_std_k: 0.25
+  diameter_frac: 0.1
+  epsilon: null
+  normalize: zscore
+  sampling_rate: 1000
+  mrp_multichannel: joint
+  rp_image_size: 64
+
+model:
+  conv_channels: [32, 64, 128]
+  fc_hidden: []
+  kernel_size: 3
+  pool_size: 2
+
+data:
+  source: ds002680
+  protocol: within_subject
+  subject: sub-002
+  bids_root: "./datas/ds002680"
+  epoch_samples: 512
+  max_samples: 200
+  max_runs: null
+  train_ratio: 0.7
+  eval_samples: null
+  stratify: true
+  force_rebuild: false
+  class_map:
+    cat_go: 0
+    cat_nogo: 1
+    rec_go: 2
+    rec_nogo: 3
+
+train:
+  batch_size: 16
+  epochs: 2
+  optimizer: adam
+  lr: 0.001
+  weight_decay: 0.0001
+  momentum: 0.9
+  dropout: 0.3
+  augment: false
+  gaussian_std: 0.05
+  channel_dropout: 0.2
+  stop_on: val_loss
+  early_stop_patience: 2
+  num_workers: 0
+  device: "cuda"
+  seed: 42
+
+output:
+  run_tsne: true
+  tsne_perplexity: 15
+  tsne_iter: 500
+  plot_curve: true
+  plot_confusion: true

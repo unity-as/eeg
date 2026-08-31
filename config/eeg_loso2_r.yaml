@@ -1,0 +1,50 @@
+# 2-Fold LOSO 正式：002↔003，内部 8:2 早停，复用已有多通道 RP 缓存
+method:
+  representation: rp
+  attention: se
+  rhythm_filter: false
+  quality_assess: false
+  embedding_dim: 3
+  time_delay: 1
+  recurrence_percentile: 0.1
+  epsilon: null
+  rp_image_size: 64
+
+data:
+  source: ds002680
+  protocol: loso2
+  bids_root: "./datas/ds002680"
+  cache_dir: "./datas/eeg_cache_loso2_r"
+  subjects: [sub-002, sub-003]
+  internal_val_ratio: 0.2
+  epoch_samples: 256
+  max_epochs_per_subject: 200
+  import_split_cache: "./datas/eeg_cache_mch_r"
+  import_split_map:
+    train: sub-002
+    val: sub-003
+  class_map:
+    cat_go: 0
+    cat_nogo: 1
+    rec_go: 2
+    rec_nogo: 3
+
+train:
+  batch_size: 16
+  epochs: 200
+  lr: 0.001
+  weight_decay: 0.0001
+  dropout: 0.3
+  augment: false
+  gaussian_std: 0.05
+  channel_dropout: 0.2
+  early_stop_patience: 30
+  num_workers: 0
+  device: "cuda"
+  checkpoint_dir: "./datas/checkpoints_eeg_loso2_r"
+  save_best_model: "best_unused.pt"
+  seed: 42
+
+output:
+  run_tsne: false
+  plot_curve: true
