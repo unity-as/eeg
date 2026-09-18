@@ -1,8 +1,8 @@
-# EEG — 递归图 + CNN 时序分类（论文 1/2/3 可配置组合）
+# EEG — 状态转移网络 + CNN
 
 ## 项目背景
 
-基于三篇 RP/MRP + CNN（可加注意力）的 EEG 论文，在**单一工程**内用配置切换方法变体。当前任务是 OpenNeuro **ds002680** 上的 **个体内** Go-nogo 四分类。`.claude/` 职责对照 `infantry_main/.claude`。
+OpenNeuro **ds002680** 个体内 Go-nogo 四分类。当前主线是老师的状态转移矩阵 + CNN；RP/MRP 是 baseline。人读文档只维护 `doc/method.md`、`doc/results.md`、`doc/config.md`，不要把同一件事再写进新文件。
 
 ## 目录导航（.claude/）
 
@@ -15,13 +15,9 @@
 | `plans/` | AI 计划输出 |
 | `skills/` | 项目技能（按需添加） |
 
-## 方法配置（摘要）
+## 方法
 
-详见 `config/eeg_ws_r.yaml` 与 `.claude/docs/architecture.md`。
-
-- **阶段 R（当前）**：`representation=rp`，`attention=se`（或 `none`），`rhythm_filter=false`
-- **阶段 M（对照）**：`representation=mrp`，`attention=additive`
-- 论文 1 选参/质量评估、节律滤波：模块可插拔，默认关
+见 `doc/method.md`。查进度看 `.claude/records/status.md`，不要在这里抄数字。
 
 ## 红线
 
