@@ -2,6 +2,7 @@ from .phase_space import build_phase_space
 from .recurrence_plot import build_recurrence_plot, build_representation
 from .rhythm import apply_rhythm_filter
 from .quality import assess_rp_quality
+from .state_transition import build_state_transition
 
 __all__ = [
     "build_phase_space",
@@ -9,4 +10,5 @@ __all__ = [
     "build_representation",
     "apply_rhythm_filter",
     "assess_rp_quality",
+    "build_state_transition",
 ]

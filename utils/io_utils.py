@@ -26,6 +26,8 @@ _PAPER_ALIGN = {
     ("rp", "se"): "论文1 Shankar 2021 RP+CNN（节律/质量是否开见 method）；论文2 Hao 2021 RP+CNN+SE",
     ("rp", "none"): "论文1 Shankar 2021 RP+CNN（无注意力）",
     ("mrp", "additive"): "论文3 Huang 2023 MRP-Net（MRP + 加性注意力 CNN）",
+    ("transition", "se"): "老师改进方向：多时间步有向加权状态转移矩阵 + CNN",
+    ("transition", "none"): "老师改进方向：多时间步有向加权状态转移矩阵 + CNN（无注意力）",
 }
 
 
@@ -66,13 +68,13 @@ def load_run_cfg(cfg_path: str, argv: Optional[List[str]] = None):
         ep = int(cfg.data.epoch_samples) if cfg.data.get("epoch_samples") is not None else 256
         if not cfg.data.get("cache_dir"):
             OmegaConf.update(
-                cfg, "data.cache_dir", f"./datas/eeg_cache_ws_{rep}/{sub}/ep{ep}"
+                cfg, "data.cache_dir", f"./datas/artifacts/eeg_cache_ws_{rep}/{sub}/ep{ep}"
             )
         if cfg.get("train") is not None and not cfg.train.get("checkpoint_dir"):
             OmegaConf.update(
                 cfg,
                 "train.checkpoint_dir",
-                f"./datas/checkpoints_eeg_ws_{rep}/{sub}/ep{ep}",
+                f"./datas/artifacts/checkpoints_eeg_ws_{rep}/{sub}/ep{ep}",
             )
         if cfg.get("train") is not None and not cfg.train.get("save_best_model"):
             OmegaConf.update(cfg, "train.save_best_model", f"best_{rep}_{sub}.pt")

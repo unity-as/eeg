@@ -52,6 +52,10 @@ def _preprocess(arr: np.ndarray, method_cfg) -> np.ndarray:
 
 def _build_1d(signal: np.ndarray, method_cfg) -> np.ndarray:
     kind = str(method_cfg.representation).lower()
+    if kind == "transition":
+        from .state_transition import build_state_transition
+
+        return build_state_transition(signal, method_cfg)
     if kind == "rp":
         eps = method_cfg.get("epsilon", None)
         return build_recurrence_plot(
@@ -79,6 +83,10 @@ def build_representation(signal: np.ndarray, method_cfg) -> Tuple[np.ndarray, di
     arr = _preprocess(arr, method_cfg)
     meta = {}
     kind = str(method_cfg.representation).lower()
+    if kind == "transition":
+        from .state_transition import build_state_transition
+
+        return build_state_transition(arr, method_cfg), meta
     if arr.ndim == 1:
         rp = _build_1d(arr, method_cfg)
     elif arr.ndim == 2:

@@ -69,7 +69,7 @@ def main() -> None:
             mp = os.path.join(ckpt, "metrics.json")
         rows.append(_row_from_metrics(ep, load_json(mp), ckpt))
 
-    out = os.path.join(ROOT, "datas", "sweeps", "epoch_ws_r.json")
+    out = os.path.join(ROOT, "datas", "artifacts", "sweeps", "epoch_ws_r.json")
     save_json({"config": cfg_path, "rows": rows}, out)
     print("\n窗长  report  cat/rec  go/nogo  早停")
     for r in rows:

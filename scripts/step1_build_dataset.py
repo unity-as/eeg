@@ -60,6 +60,10 @@ def _save_splits(cache_dir, splits, method, meta_extra):
 
 def _resolve_method(signals, method):
     method = OmegaConf.create(OmegaConf.to_container(method, resolve=True))
+    if str(method.get("representation", "rp")).lower() == "transition":
+        info = {"mode": "not_required", "reason": "state transition representation"}
+        print("相空间 not_required  representation=transition")
+        return method, info
     m, tau, info = resolve_embed_params(signals, method)
     OmegaConf.update(method, "embedding_dim", int(m), merge=True)
     OmegaConf.update(method, "time_delay", int(tau), merge=True)
@@ -143,6 +147,11 @@ def _sample_cap(data_cfg):
     return None if raw is None else int(raw)
 
 
+def _class_sample_cap(data_cfg):
+    raw = data_cfg.get("max_samples_per_class", None)
+    return None if raw is None else int(raw)
+
+
 def _fingerprint(cfg) -> dict:
     method = OmegaConf.to_container(cfg.method, resolve=True)
     method.pop("paper_align", None)
@@ -156,6 +165,7 @@ def _fingerprint(cfg) -> dict:
     return {
         "subject": str(d.subject),
         "max_samples": cap,
+        "max_samples_per_class": _class_sample_cap(d),
         "max_runs": runs,
         "epoch_samples": int(d.epoch_samples),
         "method": method,
@@ -195,6 +205,7 @@ def build_ds002680(cfg):
             subjects=subjects,
             epoch_samples=int(data_cfg.epoch_samples),
             max_epochs_per_subject=_sample_cap(data_cfg),
+            max_epochs_per_class=_class_sample_cap(data_cfg),
             max_runs_per_subject=data_cfg.get("max_runs", None),
         )
         _save_subjects(
@@ -222,6 +233,7 @@ def build_ds002680(cfg):
         subjects=subjects,
         epoch_samples=int(data_cfg.epoch_samples),
         max_epochs_per_subject=_sample_cap(data_cfg),
+        max_epochs_per_class=_class_sample_cap(data_cfg),
         max_runs_per_subject=data_cfg.get("max_runs", None),
     )
     common_meta = {

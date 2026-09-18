@@ -1,8 +1,6 @@
-# 个体实验配置项
+# 配置键
 
-正式：`config/eeg_ws_r.yaml`、`eeg_ws_m.yaml`  
-通路：`eeg_ws_smoke_*.yaml`（`max_samples: 200`，`epochs: 2`）  
-正式：`max_samples: 1500`，`epochs: 200`，**`epoch_samples: 512`**（256/400/512/800/1000 扫描后锁定）
+当前主线配置是 `config/eeg_ws_transition_3way.yaml`。RP 冻结配置是 `config/eeg_ws_r_3way_frozen.yaml`。协议和命令见 `doc/method.md`，不要在这里重写。
 
 **已删除（可推出）：** `subjects`（= `subject`）、`val_ratio` / `test_ratio`（= `1-train_ratio`）、`cache_dir` / `checkpoint_dir` / `save_best_model`（由 subject + representation 生成）、`paper_align`（由 representation + attention 生成）、`import_*`（正式必须按配置从 BIDS 建图）。
 
@@ -11,11 +9,11 @@
 `python main_pipeline.py config/eeg_ws_r.yaml data.epoch_samples=512`。  
 扫多个窗：`python scripts/sweep_epoch.py config/eeg_ws_r.yaml 400,512,800,1000`。
 
-个体缓存/权重按窗写入 `datas/eeg_cache_ws_{rp|mrp}/{subject}/ep{N}`，扫窗时并排对比用；覆盖旧正式即可。
+个体缓存/权重按窗写入 `datas/artifacts/eeg_cache_ws_{rp|mrp}/{subject}/ep{N}` 和 `datas/artifacts/checkpoints_eeg_ws_{rp|mrp}/{subject}/ep{N}`，扫窗时并排对比用；覆盖旧正式即可。
 
 | 段 | 项 | 含义 |
 |----|----|------|
-| method | representation | `rp` / `mrp` |
+| method | representation | `rp` / `mrp` / `transition` |
 | | attention | `none` / `se` / `additive` |
 | | rhythm_filter / rhythm_band | 论文1 带通；默认关。开则按 δ/θ/α/β |
 | | quality_assess | 论文1 图像质量，默认关 |
@@ -29,11 +27,19 @@
 | | sampling_rate | 节律滤波用，ds002680 为 1000 |
 | | mrp_multichannel | 仅 M：`joint` 多导一张；`per_channel` 每导一张 |
 | | rp_image_size | 图边长 |
+| | symbol_bins | 仅 transition：幅值状态/节点数量 |
+| | symbol_strategy | 仅 transition：`uniform` 等幅值分区；`quantile` 分位分区 |
+| | bin_scope | 仅 transition：当前第一版为 `per_epoch` |
+| | transition_steps | 仅 transition：状态转移时间步列表，如 `[1,2,3]` |
+| | transition_weight | 仅 transition：`count` / `probability` / `row_probability` |
+| | transition_multichannel | 仅 transition：`mean` 各导矩阵平均；`stack` 各导各时间步叠通道 |
+| | include_self_transition | 仅 transition：是否保留同一状态自转移 |
 | model | conv_channels | 各卷积层通道，如 `[32,64,128]` |
 | | fc_hidden | 分类头隐层，`[]` 表示 GAP 后直接分类 |
 | | kernel_size / pool_size | 卷积核 / 池化 |
 | data | subject | 哪个人，如 `sub-002` |
 | | max_samples | 训练规模：整数=上限；`null`=该人全部 |
+| | max_samples_per_class | 小样本冒烟用：每类最多取多少窗；`null`=不用按类截断 |
 | | max_runs | 最多几个 run；`null`=不限 |
 | | train_ratio | 训练集占比；其余为合法评估池（早停用整池） |
 | | eval_samples | 报告准确率：从合法池**不放回**抽这么多窗；`null`=用尽 |

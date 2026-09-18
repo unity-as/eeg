@@ -14,12 +14,12 @@ data:
   source: ds002680
   protocol: loso2
   bids_root: "./datas/ds002680"
-  cache_dir: "./datas/eeg_cache_loso2_r"
+  cache_dir: "./datas/artifacts/eeg_cache_loso2_r"
   subjects: [sub-002, sub-003]
   internal_val_ratio: 0.2
   epoch_samples: 256
   max_epochs_per_subject: 200
-  import_split_cache: "./datas/eeg_cache_mch_r"
+  import_split_cache: "./datas/artifacts/eeg_cache_mch_r"
   import_split_map:
     train: sub-002
     val: sub-003
@@ -41,7 +41,7 @@ train:
   early_stop_patience: 30
   num_workers: 0
   device: "cuda"
-  checkpoint_dir: "./datas/checkpoints_eeg_loso2_r"
+  checkpoint_dir: "./datas/artifacts/checkpoints_eeg_loso2_r"
   save_best_model: "best_unused.pt"
   seed: 42
 

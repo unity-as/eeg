@@ -13,7 +13,7 @@ method:
 data:
   source: ds002680
   bids_root: "./datas/ds002680"
-  cache_dir: "./datas/eeg_cache_full_r"
+  cache_dir: "./datas/artifacts/eeg_cache_full_r"
   subjects: [sub-002, sub-003, sub-004, sub-005, sub-006, sub-007, sub-008, sub-009, sub-010, sub-011, sub-012, sub-013, sub-014, sub-015]
   train_subjects: [sub-002, sub-003, sub-004, sub-005, sub-006, sub-007, sub-008, sub-009, sub-010, sub-011]
   val_subjects: [sub-012, sub-013]
@@ -35,7 +35,7 @@ train:
   early_stop_patience: 8
   num_workers: 0
   device: "cuda"
-  checkpoint_dir: "./datas/checkpoints_eeg_full_r"
+  checkpoint_dir: "./datas/artifacts/checkpoints_eeg_full_r"
   save_best_model: "best_eeg_r.pt"
   seed: 42
 

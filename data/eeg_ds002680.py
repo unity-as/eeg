@@ -63,6 +63,7 @@ def collect_epochs_by_subject(
     subjects: Sequence[str],
     epoch_samples: int = 256,
     max_epochs_per_subject: Optional[int] = None,
+    max_epochs_per_class: Optional[int] = None,
     max_runs_per_subject: Optional[int] = None,
 ) -> Dict[str, Dict[str, List[np.ndarray]]]:
     """
@@ -87,6 +88,11 @@ def collect_epochs_by_subject(
             events = _load_events(events_path)
             for _, row in events.iterrows():
                 cname = VALUE_TO_CLASS[str(row["value"])]
+                if (
+                    max_epochs_per_class is not None
+                    and len(out[sub][cname]) >= int(max_epochs_per_class)
+                ):
+                    continue
                 if max_epochs_per_subject is not None:
                     total = sum(len(v) for v in out[sub].values())
                     if total >= max_epochs_per_subject:
@@ -99,6 +105,10 @@ def collect_epochs_by_subject(
                 total = sum(len(v) for v in out[sub].values())
                 if total >= max_epochs_per_subject:
                     break
+            if max_epochs_per_class is not None and all(
+                len(v) >= int(max_epochs_per_class) for v in out[sub].values()
+            ):
+                break
         counts = {k: len(v) for k, v in out[sub].items()}
         print(f"  epochs {counts} total={sum(counts.values())}")
     return out

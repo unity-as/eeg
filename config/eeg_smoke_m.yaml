@@ -13,7 +13,7 @@ method:
 data:
   source: ds002680
   bids_root: "./datas/ds002680"
-  cache_dir: "./datas/eeg_cache_smoke_m"
+  cache_dir: "./datas/artifacts/eeg_cache_smoke_m"
   subjects: [sub-002, sub-003, sub-004]
   train_subjects: [sub-002]
   val_subjects: [sub-003]
@@ -36,7 +36,7 @@ train:
   early_stop_patience: 3
   num_workers: 0
   device: "cuda"
-  checkpoint_dir: "./datas/checkpoints_eeg_smoke_m"
+  checkpoint_dir: "./datas/artifacts/checkpoints_eeg_smoke_m"
   save_best_model: "best_eeg_m_smoke.pt"
   seed: 42
 
