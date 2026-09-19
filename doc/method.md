@@ -19,7 +19,7 @@
 - 划分：每人 70/15/15，分层，`split_seed=42`
 - 划分文件：`datas/experiments_3way/splits/`，只读复用，不要覆盖
 - 训练种子：42、43、44。按 `val_acc` 早停
-- test：表示和训练参数冻结之前不要打开。打开必须同时加 `--evaluate-test --confirm-test`
+- test：冻结前不要打开，打开必须同时加 `--evaluate-test --confirm-test`。`bins=6`、按导堆叠这一次已经用已有权重评过，数字在 `doc/results.md`。其他设置不要再开
 
 跨人 LOSO 已放弃，不再作为主线。
 
@@ -53,4 +53,4 @@ python scripts/experiments/train_3way.py --config config/eeg_ws_transition_3way.
 
 ## 还没做
 
-在同一套冻结划分上、只看验证集：节点数 5 / 6 / 8 / 10 / 12，以及各导平均和按导堆叠。哪一档明显更好再冻结，然后才评一次 test。在这之前不接 GCN。
+节点数只在各导平均下扫过。`bins=6`、按导堆叠的 test 已经评过，不要再对其他节点数开 test。GCN 还没做。

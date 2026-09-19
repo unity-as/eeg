@@ -5,19 +5,22 @@
 原始汇总：
 
 - RP：`datas/experiments_3way/final_test_summary.json`
-- Transition：`datas/experiments_3way/transition/validation_summary.json`
+- Transition val：`datas/experiments_3way/transition/validation_summary.json`
+- Transition 按导堆叠 test：`datas/experiments_3way/transition/b6_stack_test_summary.json`
 - Word 快照 `doc/final_results_rp_se_cnn.docx` 停在 2026-09-18，不再改
 
-## 当前协议上的两行
+## 当前协议上的对照
 
-协议相同：14 人、correct-only、800 ms、70/15/15。RP 报的是独立 test；Transition 报的是 val，test 未打开。不要把 0.5033 写成测试准确率。
+协议相同：14 人、correct-only、800 ms、70/15/15。RP 和按导堆叠的 Transition 报的是独立 test。各导平均仍是 val，不要把 0.5033 写成测试准确率。
 
 | 方法 | 报告集 | 均值 | 95% CI |
 |---|---|---:|---|
 | RP + SE CNN（已冻结） | test | 0.8952 | 0.8731 – 0.9173 |
-| Transition + SE CNN 第一版 | val | 0.5033 | 0.4857 – 0.5210 |
+| Transition + SE CNN，各导平均，6 节点 | val | 0.5033 | 0.4857 – 0.5210 |
+| Transition + SE CNN，按导堆叠，6 节点 | val | 0.8803 | 0.8593 – 0.9014 |
+| Transition + SE CNN，按导堆叠，6 节点 | test | 0.8547 | 0.8304 – 0.8790 |
 
-RP 另有 balanced acc 0.8793、macro F1 0.8834。冻结前的 RP val 均值是 0.8800。Transition 高于四分类随机 0.25，低于同协议 RP。
+按导堆叠的 test 比队友 RP 低 0.0405。RP 的 balanced acc 0.8793、macro F1 0.8834；堆叠 test 是 0.8377、0.8416。堆叠 val 0.8803 和 RP 冻结前 val 0.8800 同档，test 没有保住。
 
 ### RP 每人 test（三种子平均）
 
@@ -59,7 +62,41 @@ RP 另有 balanced acc 0.8793、macro F1 0.8834。冻结前的 RP val 均值是 
 | sub-014 | 0.5064 | 0.0436 |
 | sub-015 | 0.5140 | 0.0400 |
 
-42 次全部 `test_evaluated=false`。输入 `[3, 6, 6]`。sub-002 划分为 1708 / 366 / 366。
+上表是各导平均，42 次当时 `test_evaluated=false`。输入 `[3, 6, 6]`。按导堆叠是 31 导 × 3 个时间步，输入 `[93, 6, 6]`。sub-002 划分为 1708 / 366 / 366。
+
+### Transition 按导堆叠每人 test（三种子平均）
+
+| subject | acc | std |
+|---|---:|---:|
+| sub-002 | 0.8880 | 0.0109 |
+| sub-003 | 0.7982 | 0.0129 |
+| sub-004 | 0.8883 | 0.0057 |
+| sub-005 | 0.8379 | 0.0089 |
+| sub-006 | 0.8583 | 0.0213 |
+| sub-007 | 0.8255 | 0.0028 |
+| sub-008 | 0.8935 | 0.0064 |
+| sub-009 | 0.8443 | 0.0095 |
+| sub-010 | 0.8476 | 0.0016 |
+| sub-011 | 0.9333 | 0.0100 |
+| sub-012 | 0.8175 | 0.0237 |
+| sub-013 | 0.8152 | 0.0272 |
+| sub-014 | 0.9121 | 0.0055 |
+| sub-015 | 0.8058 | 0.0086 |
+
+三种子整体：42 = 0.8531，43 = 0.8524，44 = 0.8586。各类 recall：cat_go 0.7884，cat_nogo 0.7797，rec_go 0.8911，rec_nogo 0.8936。权重是已有 checkpoint，没有重训。
+
+## 表示消融（val）
+
+同一划分、三种子。各导平均下改节点数没有拉开差距。按导堆叠的 val 是 0.8803；这一格的 test 已评，见上表。其余格子仍是 val。汇总：`datas/experiments_3way/transition/sweep/sweep_summary.json`。
+
+| symbol_bins | 多导 | val acc | 95% CI |
+|---:|---|---:|---|
+| 5 | mean | 0.4686 | 0.4509 – 0.4863 |
+| 6 | mean | 0.5033 | 0.4857 – 0.5210 |
+| 8 | mean | 0.5143 | 0.4922 – 0.5364 |
+| 10 | mean | 0.5282 | 0.5065 – 0.5499 |
+| 12 | mean | 0.4759 | 0.4587 – 0.4930 |
+| 6 | stack | 0.8803 | 0.8593 – 0.9014 |
 
 ## 历史记录
 
