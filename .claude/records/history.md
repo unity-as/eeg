@@ -2,7 +2,7 @@
 
 ## 2026-09-19
 
-- 人读文档收拢：方法只在 `doc/method.md`，数字只在 `doc/results.md`，配置键只在 `doc/config.md`
+- 6 节点按导堆叠已评 test，用已有权重，没有重训。见 `doc/results.md`
 
 ## 2026-09-18
 

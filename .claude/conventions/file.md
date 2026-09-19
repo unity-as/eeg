@@ -62,6 +62,7 @@ EEG/
 │   └── experiments/         # 三集数据、sealed-test 训练、调参
 │       ├── build_correct_only_dataset.py
 │       ├── train_3way.py
+│       ├── sweep_transition_3way.py
 │       └── tune.py
 ├── datas/                   # 运行产物（gitignore 部分）
 ├── doc/                     # 人读文档，一处只维护一份

@@ -8,7 +8,8 @@
 
 - [x] 冒烟
 - [x] 正式 14 人 val，test 封闭
-- [ ] 同一划分上扫节点数和各导平均/堆叠，只看 val
-- [ ] 冻结前不要 `--evaluate-test`
+- [x] 同一划分上扫节点数和各导平均/堆叠，只看 val
+- [x] `bins=6`、按导堆叠的 test 已评。见 `doc/results.md`
+- [ ] 其他设置不要再开 test
 - [ ] 消融后再问老师是否接 GCN
 - [x] commit
