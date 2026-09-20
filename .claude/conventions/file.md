@@ -11,6 +11,15 @@ EEG/
 │   ├── eeg_ws_r_3way_frozen.yaml  # 冻结参数的正式三集配置
 │   ├── eeg_ws_transition.yaml       # 个体内正式 Transition（旧两池）
 │   ├── eeg_ws_transition_3way.yaml  # 三集协议对齐老师方案
+│   ├── eeg_ws_transition_3way_global.yaml  # 必选：训练集各导固定幅值分档
+│   ├── eeg_ws_transition_3way_global_self.yaml  # 同一表示，注意力改为 self
+│   ├── eeg_ws_transition_3way_global_none.yaml  # 同一表示，不加注意力
+│   ├── eeg_ws_transition_3way_global_none_opt.yaml  # 优化参数，不加注意力
+│   ├── eeg_ws_transition_3way_global_self_opt.yaml  # 优化参数，自注意力
+│   ├── eeg_ws_transition_3way_gcn.yaml     # GCN，不加图注意力
+│   ├── eeg_ws_transition_3way_gcn_attn.yaml # GCN，图注意力
+│   ├── eeg_ws_smoke_transition_self.yaml # 自注意力冒烟
+│   ├── eeg_ws_smoke_transition_gcn.yaml # GCN 冒烟
 │   ├── eeg_ws_smoke_transition.yaml # 个体内冒烟 Transition
 │   ├── eeg_ws_smoke_transition_3way.yaml # 三集 Transition 冒烟
 │   ├── eeg_ws_m.yaml        # 个体内正式 M

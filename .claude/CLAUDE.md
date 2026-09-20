@@ -19,6 +19,12 @@ OpenNeuro **ds002680** 个体内 Go-nogo 四分类。当前主线是老师的状
 
 见 `doc/method.md`。查进度看 `.claude/records/status.md`，不要在这里抄数字。
 
+## 分支
+
+`master` 就是当前这套框架：状态转移为主线，RP/MRP 为 baseline。不要在 `master` 上换成另一套方案。
+
+多方案各开分支。旧的 RP/MRP 论文对齐线在标签 `rp-mrp-baseline`。
+
 ## 红线
 
 - 未经用户允许：勿改 `.claude/conventions/`、`.claude/skills/`

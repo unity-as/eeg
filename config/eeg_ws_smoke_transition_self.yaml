@@ -1,0 +1,60 @@
+# 自注意力冒烟。复用统一节点编号的表示，不重建，不评 test。
+method:
+  representation: transition
+  attention: self
+  rhythm_filter: false
+  rhythm_band: delta
+  quality_assess: false
+  normalize: none
+  sampling_rate: 1000
+  symbol_bins: 6
+  symbol_strategy: uniform
+  bin_scope: train_global
+  transition_steps: [1, 2, 3]
+  transition_weight: probability
+  transition_multichannel: stack
+  include_self_transition: true
+
+model:
+  conv_channels: [32, 64]
+  fc_hidden: []
+  kernel_size: 3
+  pool_size: 2
+
+data:
+  source: ds002680
+  bids_root: "./datas/ds002680"
+  output_root: "./datas/experiments_3way/transition/representations/ep800_b6_stack_global"
+  splits_dir: "./datas/experiments_3way/splits"
+  quality_dir: "./datas/experiments_3way/transition/global_quality"
+  subjects: [sub-002]
+  correct_only: true
+  epoch_samples: 800
+  rp_device: cpu
+  rp_batch_size: 32
+  max_samples: null
+  max_runs: null
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  stratify: true
+  split_seed: 42
+
+train:
+  output_dir: "./datas/experiments_3way/transition/smoke_self/checkpoints"
+  checkpoint_name: "best_transition_self.pt"
+  evaluate_test: false
+  batch_size: 32
+  epochs: 2
+  optimizer: adam
+  lr: 0.0005
+  weight_decay: 0.0001
+  dropout: 0.2
+  stop_on: val_acc
+  early_stop_patience: 2
+  num_workers: 0
+  device: "cpu"
+  deterministic: true
+  require_gpu: false
+  seed: 42
+  seeds: [42]

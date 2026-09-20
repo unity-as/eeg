@@ -4,7 +4,7 @@
 
 ## 现在做什么
 
-主线是老师的状态转移网络：EEG 按幅值符号化，做成多时间步有向加权转移矩阵，再交给 CNN。RP/MRP 只作 baseline。GCN、EEGNet、1D CNN 都还没做。
+主线是老师的状态转移网络：信号按幅值符号化，做成多时间步有向加权转移矩阵，再交给 CNN 或 GCN（`model.arch` 切换）。RP/MRP 只作 baseline。脑电四分类已评完，冻在标签 `eeg-cnn`、`eeg-gcn`。当前分支做旋转机械故障诊断。
 
 数据协议沿用队友已经冻结的三集，不改他们的划分和 RP 结果。
 
@@ -55,11 +55,11 @@ python scripts/experiments/train_3way.py --config config/eeg_ws_transition_3way.
 
 ## 还没做
 
-验收对照的数字只加在 `doc/results.md`，不另开对照文件。`master` 是 CNN 分支，只收这份对照。GCN 实现留在 `feat/transition-gcn`，不合并代码。
+验收对照的数字只加在 `doc/results.md`，不另开对照文件。CNN 与 GCN 在同一工程，用 `model.arch` 切换。脑电结果冻在标签 `eeg-cnn`、`eeg-gcn`。
 
-统一节点编号已评完，数字在 `doc/results.md`。配置在 `feat/transition-gcn` 的 `config/eeg_ws_transition_3way_global.yaml`。
+统一节点编号已评完，数字在 `doc/results.md`。配置 `config/eeg_ws_transition_3way_global.yaml`。
 
-- CNN：矩阵进卷积网络。注意力是开关。优化参数是 `lr=1e-3`、`batch_size=64`，配置在 GCN 分支的 `config/eeg_ws_transition_3way_global_none_opt.yaml` 和 `config/eeg_ws_transition_3way_global_self_opt.yaml`。14 人上这次扫描没有超过现有参数。数字在 `doc/results.md`。
-- GCN：和 CNN 互斥。分支 `feat/transition-gcn`。不加图注意力与加图注意力都已评 test。没有扫学习率。数字在 `doc/results.md`。
+- CNN：矩阵进卷积网络。注意力是开关。优化参数是 `lr=1e-3`、`batch_size=64`，配置 `config/eeg_ws_transition_3way_global_none_opt.yaml`、`config/eeg_ws_transition_3way_global_self_opt.yaml`。数字在 `doc/results.md`。
+- GCN：和 CNN 互斥，配置 `config/eeg_ws_transition_3way_gcn.yaml`。图注意力配置 `config/eeg_ws_transition_3way_gcn_attn.yaml`。两种都已评 test。没有扫学习率。数字在 `doc/results.md`。
 
 手选网络指标加分类器仍是单独一行对照，不接到这两条路上。验证集定下后评一次 test。数字只并进 `doc/results.md`。

@@ -31,6 +31,18 @@ from utils.io_utils import ensure_dir, load_json, save_json
 CLASS_NAMES = [k for k, _ in sorted(CLASS_MAP.items(), key=lambda kv: int(kv[1]))]
 
 
+def method_name(cfg) -> str:
+    model_cfg = cfg.get("model") if cfg.get("model") is not None else {}
+    arch = str(model_cfg.get("arch", "cnn")).lower()
+    representation = str(cfg.method.get("representation", "rp")).lower()
+    if arch == "gcn":
+        if bool(model_cfg.get("gcn_attention", False)):
+            return f"{representation}_gcn_attn"
+        return f"{representation}_gcn"
+    attention = str(cfg.method.get("attention", "none")).lower()
+    return f"{representation}_{attention}_cnn"
+
+
 def set_seed(seed: int, deterministic: bool = True) -> None:
     random.seed(seed)
     np.random.seed(seed)
@@ -148,7 +160,12 @@ def train_one(subject: str, seed: int, cfg, evaluate_test: bool, confirm_test: b
     val_loader = make_loader(X_val, y_val, batch_size, workers, False)
 
     criterion = nn.CrossEntropyLoss()
-    model = build_model(len(CLASS_NAMES), cfg, in_channels=int(X_train.shape[1])).to(device)
+    model = build_model(
+        len(CLASS_NAMES),
+        cfg,
+        in_channels=int(X_train.shape[1]),
+        image_size=int(X_train.shape[-1]),
+    ).to(device)
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=float(cfg.train.lr),
@@ -230,10 +247,7 @@ def train_one(subject: str, seed: int, cfg, evaluate_test: bool, confirm_test: b
         "subject": subject,
         "seed": int(seed),
         "protocol": "within_subject_3way",
-        "method": "{}_{}_cnn".format(
-            str(cfg.method.get("representation", "rp")).lower(),
-            str(cfg.method.get("attention", "none")).lower(),
-        ),
+        "method": method_name(cfg),
         "correct_only": bool(cfg.data.get("correct_only", False)),
         "epoch_samples": int(cfg.data.epoch_samples),
         "split_seed": int(meta["split_seed"]),

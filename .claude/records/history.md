@@ -1,6 +1,20 @@
 # Changelog
 
+- CNN 与 GCN 合进 `feat/rotating-fault`，用配置切换。脑电冻在标签 `eeg-cnn`、`eeg-gcn`。
+
+## 2026-09-20
+
+- GCN 种子 42 的 val 已记。43、44 还在跑，test 未开。见 `doc/results.md`
+- GCN 不加图注意力和加图注意力的 test 已评，没有重训。见 `doc/results.md`
+- CNN 在 CUDA 上优化参数后，不加注意力和自注意力的 test 已评。见 `doc/results.md`
+- 训练设备 `cuda` 为可选项。见 `doc/config.md`
+
 ## 2026-09-19
+
+- 新方案在验证集定下后都评一次 test。见 `doc/method.md`
+- 后续 CNN、GCN 分两条路。注意力是开关，不和骨干叠成第三条路。见 `doc/method.md`
+- CNN 自注意力开关已评 test。见 `doc/results.md`
+- 统一节点编号已评 test。见 `doc/results.md`
 
 - 6 节点按导堆叠已评 test，用已有权重，没有重训。见 `doc/results.md`
 

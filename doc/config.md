@@ -34,7 +34,7 @@
 | | transition_weight | 仅 transition：`count` / `probability` / `row_probability` |
 | | transition_multichannel | 仅 transition：`mean` 各导矩阵平均；`stack` 各导各时间步叠通道 |
 | | include_self_transition | 仅 transition：是否保留同一状态自转移 |
-| model | arch | `cnn`（默认）或 `gcn`。两者互斥，不叠在一起。`gcn` 与注意力 `self` 的代码在 `feat/transition-gcn`，不在本分支 |
+| model | arch | `cnn`（默认）或 `gcn`。两者互斥，不叠在一起。同一工程里用配置切换 |
 | | gcn_hidden / gcn_layers / gcn_pool / gcn_layout / gcn_steps / gcn_attention | 仅 `arch=gcn`。`relational` 把每导的多个时间步当作同一批节点上的不同边；`independent` 每张矩阵一张图。`gcn_steps` 是时间步数。`gcn_attention` 为 true 时在边上做图注意力，默认关 |
 | | conv_channels | 各卷积层通道，如 `[32,64,128]`。仅 CNN |
 | | fc_hidden | 分类头隐层，`[]` 表示 GAP 后直接分类 |

@@ -1,0 +1,90 @@
+{
+  "config": "config/eeg_ws_transition_3way_global_none.yaml",
+  "attention": "none",
+  "params": "same as global SE CNN, not a new search",
+  "n_subjects": 14,
+  "n_runs": 42,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "test_evaluated": false,
+  "ci_method": "t_0.975_df_n-1 * sample_std / sqrt(n)",
+  "overall_subject_mean_val_acc": 0.8371985806898755,
+  "overall_subject_std_val_acc": 0.03965444777272722,
+  "overall_val_ci95_low": 0.8143027842013029,
+  "overall_val_ci95_high": 0.8600943771784482,
+  "by_subject": [
+    {
+      "subject": "sub-002",
+      "mean": 0.8806921675774134,
+      "std": 0.011375224040798552
+    },
+    {
+      "subject": "sub-003",
+      "mean": 0.8412698412698413,
+      "std": 0.013420386169115766
+    },
+    {
+      "subject": "sub-004",
+      "mean": 0.8461538461538461,
+      "std": 0.009905360646879056
+    },
+    {
+      "subject": "sub-005",
+      "mean": 0.8020257826887661,
+      "std": 0.01045839474364693
+    },
+    {
+      "subject": "sub-006",
+      "mean": 0.8392370572207084,
+      "std": 0.005449591280653976
+    },
+    {
+      "subject": "sub-007",
+      "mean": 0.8125577100646352,
+      "std": 0.012490996545215766
+    },
+    {
+      "subject": "sub-008",
+      "mean": 0.9101851851851852,
+      "std": 0.0069905874400654835
+    },
+    {
+      "subject": "sub-009",
+      "mean": 0.7531876138433514,
+      "std": 0.015048006959798053
+    },
+    {
+      "subject": "sub-010",
+      "mean": 0.837465564738292,
+      "std": 0.012007986070359977
+    },
+    {
+      "subject": "sub-011",
+      "mean": 0.8685185185185186,
+      "std": 0.008929306260178693
+    },
+    {
+      "subject": "sub-012",
+      "mean": 0.8012646793134598,
+      "std": 0.012220189032040377
+    },
+    {
+      "subject": "sub-013",
+      "mean": 0.8628519527702089,
+      "std": 0.00832438818338937
+    },
+    {
+      "subject": "sub-014",
+      "mean": 0.8076923076923078,
+      "std": 0.00475838133947492
+    },
+    {
+      "subject": "sub-015",
+      "mean": 0.8576779026217229,
+      "std": 0.0016217704190719545
+    }
+  ]
+}
