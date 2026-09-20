@@ -13,6 +13,8 @@
 - Transition GCN，三种子：`datas/experiments_3way/transition/gcn_test_summary.json`
 - Transition GCN 图注意力：`datas/experiments_3way/transition/gcn_attn_test_summary.json`
 - Transition CNN 不加注意力，现有参数的 val：`datas/experiments_3way/transition/global_none_val_summary.json`
+- Transition CNN 优化参数、不加注意力：`datas/experiments_3way/transition/global_none_opt_test_summary.json`
+- Transition CNN 优化参数、自注意力：`datas/experiments_3way/transition/global_self_opt_test_summary.json`
 - Word 快照 `doc/final_results_rp_se_cnn.docx` 停在 2026-09-18，不再改
 
 ## 当前协议上的对照
@@ -33,8 +35,12 @@
 | Transition + GCN，按导堆叠，训练集分档，图注意力 | val | 0.8673 | 0.8537 – 0.8810 |
 | Transition + GCN，按导堆叠，训练集分档，图注意力 | test | 0.8379 | 0.8286 – 0.8472 |
 | Transition + CNN，按导堆叠，训练集分档，不加注意力，现有参数 | val | 0.8372 | 0.8143 – 0.8601 |
+| Transition + CNN，按导堆叠，训练集分档，不加注意力，优化参数 | val | 0.8343 | 0.8105 – 0.8581 |
+| Transition + CNN，按导堆叠，训练集分档，不加注意力，优化参数 | test | 0.8055 | 0.7842 – 0.8267 |
+| Transition + CNN，按导堆叠，训练集分档，自注意力，优化参数 | val | 0.8372 | 0.8156 – 0.8588 |
+| Transition + CNN，按导堆叠，训练集分档，自注意力，优化参数 | test | 0.8052 | 0.7882 – 0.8221 |
 
-按导堆叠、每个试次自己分档的 test 比队友 RP 低 0.0405。RP 的 balanced acc 0.8793、macro F1 0.8834；这一档堆叠 test 是 0.8377、0.8416。统一节点编号后 test 是 0.7990。同一表示把 SE 换成卷积前的空间自注意力，test 是 0.8093，比 SE 高 0.0103，仍比按试次分档低 0.0454，比 RP 低 0.0859。自注意力的 balanced acc 0.8000，macro F1 0.7999。验证集均值 0.8373。参数开跑前已定，测试集没有用来选开关。GCN 不加图注意力的 test 是 0.8225，balanced acc 0.8140，macro F1 0.8143。加上图注意力后 test 是 0.8379，高 0.0154，balanced acc 0.8275，macro F1 0.8278。图注意力的 test 仍比按试次分档的堆叠 CNN 低 0.0168，比 RP 低 0.0573。权重是已有 checkpoint，没有重训。不加注意力的 CNN 用的是和 SE 相同的现有参数，三种子 val 是 0.8372，test 未开，不是后面优化参数的那一轮。
+按导堆叠、每个试次自己分档的 test 比队友 RP 低 0.0405。RP 的 balanced acc 0.8793、macro F1 0.8834；这一档堆叠 test 是 0.8377、0.8416。统一节点编号后 test 是 0.7990。同一表示把 SE 换成卷积前的空间自注意力，test 是 0.8093，比 SE 高 0.0103，仍比按试次分档低 0.0454，比 RP 低 0.0859。自注意力的 balanced acc 0.8000，macro F1 0.7999。验证集均值 0.8373。参数开跑前已定，测试集没有用来选开关。GCN 不加图注意力的 test 是 0.8225，balanced acc 0.8140，macro F1 0.8143。加上图注意力后 test 是 0.8379，高 0.0154，balanced acc 0.8275，macro F1 0.8278。图注意力的 test 仍比按试次分档的堆叠 CNN 低 0.0168，比 RP 低 0.0573。权重是已有 checkpoint，没有重训。不加注意力的 CNN 用的是和 SE 相同的现有参数，三种子 val 是 0.8372，test 未开。之后在验证集上选了 `lr=1e-3`、`dropout=0.2`、`batch_size=64`，同一参数分别跑不加注意力和自注意力：test 是 0.8055 和 0.8052，几乎一样；比旧 SE test 高约 0.006，仍低于 GCN 图注意力的 0.8379，也低于按试次分档堆叠 CNN 的 0.8547。优化后的自注意力 test 比旧自注意力 0.8093 低 0.0041。参数只看 val，test 用已有权重评了一次。
 
 ### RP 每人 test（三种子平均）
 
@@ -203,6 +209,48 @@
 | sub-013 | 0.8629 | 0.0083 |
 | sub-014 | 0.8077 | 0.0048 |
 | sub-015 | 0.8577 | 0.0016 |
+
+### Transition CNN 优化参数、不加注意力每人 test（三种子平均）
+
+`lr=1e-3`，`dropout=0.2`，`batch_size=64`。CUDA 训练。test 用已有权重评了一次。
+
+| subject | acc | std |
+|---|---:|---:|
+| sub-002 | 0.8197 | 0.0213 |
+| sub-003 | 0.7834 | 0.0136 |
+| sub-004 | 0.8324 | 0.0317 |
+| sub-005 | 0.7753 | 0.0131 |
+| sub-006 | 0.8174 | 0.0152 |
+| sub-007 | 0.7830 | 0.0222 |
+| sub-008 | 0.8667 | 0.0073 |
+| sub-009 | 0.7186 | 0.0336 |
+| sub-010 | 0.8356 | 0.0152 |
+| sub-011 | 0.8130 | 0.0163 |
+| sub-012 | 0.7669 | 0.0232 |
+| sub-013 | 0.8225 | 0.0155 |
+| sub-014 | 0.8141 | 0.0168 |
+| sub-015 | 0.8282 | 0.0199 |
+
+### Transition CNN 优化参数、自注意力每人 test（三种子平均）
+
+与上一表同一训练参数，只打开 `attention=self`。
+
+| subject | acc | std |
+|---|---:|---:|
+| sub-002 | 0.8270 | 0.0069 |
+| sub-003 | 0.7962 | 0.0075 |
+| sub-004 | 0.8434 | 0.0048 |
+| sub-005 | 0.7634 | 0.0367 |
+| sub-006 | 0.8138 | 0.0201 |
+| sub-007 | 0.7839 | 0.0073 |
+| sub-008 | 0.8509 | 0.0098 |
+| sub-009 | 0.7395 | 0.0201 |
+| sub-010 | 0.8136 | 0.0277 |
+| sub-011 | 0.8139 | 0.0306 |
+| sub-012 | 0.7922 | 0.0149 |
+| sub-013 | 0.8071 | 0.0262 |
+| sub-014 | 0.8077 | 0.0145 |
+| sub-015 | 0.8198 | 0.0162 |
 
 ## 表示消融（val）
 

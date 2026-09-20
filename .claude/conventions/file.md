@@ -14,6 +14,8 @@ EEG/
 │   ├── eeg_ws_transition_3way_global.yaml  # 必选：训练集各导固定幅值分档
 │   ├── eeg_ws_transition_3way_global_self.yaml  # 同一表示，注意力改为 self
 │   ├── eeg_ws_transition_3way_global_none.yaml  # 同一表示，不加注意力
+│   ├── eeg_ws_transition_3way_global_none_opt.yaml  # 优化参数，不加注意力
+│   ├── eeg_ws_transition_3way_global_self_opt.yaml  # 优化参数，自注意力
 │   ├── eeg_ws_transition_3way_gcn.yaml     # GCN，不加图注意力
 │   ├── eeg_ws_transition_3way_gcn_attn.yaml # GCN，图注意力
 │   ├── eeg_ws_smoke_transition_self.yaml # 自注意力冒烟

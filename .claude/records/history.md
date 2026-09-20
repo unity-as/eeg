@@ -4,6 +4,7 @@
 
 - GCN 种子 42 的 val 已记。43、44 还在跑，test 未开。见 `doc/results.md`
 - GCN 不加图注意力和加图注意力的 test 已评，没有重训。见 `doc/results.md`
+- CNN 在 CUDA 上优化参数后，不加注意力和自注意力的 test 已评。见 `doc/results.md`
 - 训练设备 `cuda` 为可选项。见 `doc/config.md`
 
 ## 2026-09-19

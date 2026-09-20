@@ -15,7 +15,7 @@
 - [x] CNN 自注意力开关已评 test。见 `doc/results.md`
 - [x] GCN 不加注意力，三种子 val 已齐，不重跑。test 未开。见 `doc/results.md`
 - [x] GCN 不加注意力和加图注意力都已评 test。见 `doc/results.md`
-- [ ] 回到 CNN。先优化参数，再跑加注意力和不加注意力。现有参数的「不加」val 已记，见 `doc/results.md`，不算优化后的那一轮
+- [x] 回到 CNN。验证集上选了参数，CUDA 上跑完不加注意力和自注意力，test 已评。见 `doc/results.md`
 - [ ] 把 GCN 文档合进 `master`。综合结果，review 代码，实验数据和结论只记在 `doc/results.md`
 - [ ] 手选指标仍是对照行
 - [x] commit

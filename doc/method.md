@@ -61,7 +61,7 @@ python scripts/experiments/train_3way.py --config config/eeg_ws_transition_3way.
 
 后续两条路，不放进同一个模型，都另开分支，不换掉 `master`：
 
-- CNN：矩阵进现有卷积网络。注意力是开关：`none`、`se`、`additive`、`self`。`self` 已在统一节点编号的按导堆叠上评过 test，数字在 `doc/results.md`。配置 `config/eeg_ws_transition_3way_global_self.yaml`。
-- GCN：同一套转移关系画成图再进 GCN，和 CNN 互斥。分支 `feat/transition-gcn`，配置 `config/eeg_ws_transition_3way_gcn.yaml`。图注意力配置 `config/eeg_ws_transition_3way_gcn_attn.yaml`。两种都已评 test，数字在 `doc/results.md`。CNN 不加注意力的现有参数 val 也在那里；优化参数后的 CNN 还没跑。
+- CNN：矩阵进现有卷积网络。注意力是开关。现有参数的 SE / 自注意力 / 不加注意力见上。优化参数配置：`config/eeg_ws_transition_3way_global_none_opt.yaml`、`config/eeg_ws_transition_3way_global_self_opt.yaml`（`lr=1e-3`，`batch_size=64`）。数字在 `doc/results.md`。
+- GCN：同一套转移关系画成图再进 GCN，和 CNN 互斥。分支 `feat/transition-gcn`，配置 `config/eeg_ws_transition_3way_gcn.yaml`。图注意力配置 `config/eeg_ws_transition_3way_gcn_attn.yaml`。两种都已评 test，数字在 `doc/results.md`。
 
 手选网络指标加分类器仍是单独一行对照，不接到这两条路上。验证集定下后评一次 test。数字只并进 `doc/results.md`。
