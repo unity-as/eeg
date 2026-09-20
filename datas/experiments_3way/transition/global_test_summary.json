@@ -1,0 +1,97 @@
+{
+  "config": "config/eeg_ws_transition_3way_global.yaml",
+  "bin_scope": "train_global",
+  "transition_multichannel": "stack",
+  "symbol_bins": 6,
+  "normalize": "none",
+  "checkpoint": "existing best_transition_se.pt, not retrained",
+  "n_subjects": 14,
+  "n_runs": 42,
+  "test_evaluated": true,
+  "ci_method": "t_0.975_df_n-1 * sample_std / sqrt(n)",
+  "overall_subject_mean_val_acc": 0.8322171760692167,
+  "overall_val_ci95_low": 0.8072455243191697,
+  "overall_val_ci95_high": 0.8571888278192638,
+  "overall_subject_mean_acc": 0.7989664103909552,
+  "overall_subject_std_acc": 0.03894638599526526,
+  "overall_ci95_low": 0.7764794366011885,
+  "overall_ci95_high": 0.8214533841807219,
+  "overall_subject_mean_balanced_acc": 0.7900096223861353,
+  "overall_balanced_ci95_low": 0.7683641593454574,
+  "overall_balanced_ci95_high": 0.8116550854268131,
+  "overall_subject_mean_macro_f1": 0.7895921800624935,
+  "overall_f1_ci95_low": 0.76758213187781,
+  "overall_f1_ci95_high": 0.8116022282471771,
+  "by_subject": [
+    {
+      "subject": "sub-002",
+      "mean": 0.8306010928961749,
+      "std": 0.00985123299307102
+    },
+    {
+      "subject": "sub-003",
+      "mean": 0.788328387734916,
+      "std": 0.009538724788321455
+    },
+    {
+      "subject": "sub-004",
+      "mean": 0.8498168498168498,
+      "std": 0.004196497889153684
+    },
+    {
+      "subject": "sub-005",
+      "mean": 0.7458563535911602,
+      "std": 0.014354012217421632
+    },
+    {
+      "subject": "sub-006",
+      "mean": 0.7965485921889192,
+      "std": 0.00832438818338937
+    },
+    {
+      "subject": "sub-007",
+      "mean": 0.7894736842105262,
+      "std": 0.0027700831024930483
+    },
+    {
+      "subject": "sub-008",
+      "mean": 0.8546296296296295,
+      "std": 0.0042431256434776144
+    },
+    {
+      "subject": "sub-009",
+      "mean": 0.7076502732240438,
+      "std": 0.05815244987375068
+    },
+    {
+      "subject": "sub-010",
+      "mean": 0.8172635445362718,
+      "std": 0.009674613179846395
+    },
+    {
+      "subject": "sub-011",
+      "mean": 0.8175925925925925,
+      "std": 0.025204921460770753
+    },
+    {
+      "subject": "sub-012",
+      "mean": 0.7841011743450768,
+      "std": 0.014925665439799759
+    },
+    {
+      "subject": "sub-013",
+      "mean": 0.7907608695652174,
+      "std": 0.029393081049978165
+    },
+    {
+      "subject": "sub-014",
+      "mean": 0.7893772893772893,
+      "std": 0.03740032574480244
+    },
+    {
+      "subject": "sub-015",
+      "mean": 0.823529411764706,
+      "std": 0.004851682934366586
+    }
+  ]
+}

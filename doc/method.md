@@ -19,7 +19,7 @@
 - 划分：每人 70/15/15，分层，`split_seed=42`
 - 划分文件：`datas/experiments_3way/splits/`，只读复用，不要覆盖
 - 训练种子：42、43、44。按 `val_acc` 早停
-- test：冻结前不要打开，打开必须同时加 `--evaluate-test --confirm-test`。`bins=6`、按导堆叠这一次已经用已有权重评过，数字在 `doc/results.md`。其他设置不要再开
+- test：调参只看 val。方案在验证集定下之后评一次 test，必须同时加 `--evaluate-test --confirm-test`。当前 `bins=6`、按导堆叠已经评过，数字在 `doc/results.md`，不再拿这次 test 去选别的设置。新方案另开分支，定下后同样评 test
 
 跨人 LOSO 已放弃，不再作为主线。
 
@@ -34,6 +34,8 @@
 - 注意力 SE。产物在 `datas/experiments_3way/transition/`，与 RP 冻结权重分开
 
 旧两池配置 `config/eeg_ws_transition.yaml` 不是这条协议，不要拿它的结果和三集比。
+
+统一节点编号用 `config/eeg_ws_transition_3way_global.yaml`：`bin_scope=train_global`，按导堆叠，`normalize=none`。分档边界只从该人训练集计算。产物不覆盖按试次分档的目录。test 已评，数字在 `doc/results.md`。
 
 ## RP baseline
 
@@ -53,4 +55,13 @@ python scripts/experiments/train_3way.py --config config/eeg_ws_transition_3way.
 
 ## 还没做
 
-节点数只在各导平均下扫过。`bins=6`、按导堆叠的 test 已经评过，不要再对其他节点数开 test。GCN 还没做。
+验收对照的数字只加在 `doc/results.md`，不另开对照文件。
+
+统一节点编号已评完，数字在 `doc/results.md`。配置 `config/eeg_ws_transition_3way_global.yaml`。
+
+后续两条路，不放进同一个模型，都另开分支，不换掉 `master`：
+
+- CNN：矩阵进现有卷积网络。注意力是开关：`none`、`se`、`additive`、`self`。`self` 已在统一节点编号的按导堆叠上评过 test，数字在 `doc/results.md`。配置 `config/eeg_ws_transition_3way_global_self.yaml`。
+- GCN：同一套转移关系画成图再进 GCN，和 CNN 互斥。分支 `feat/transition-gcn`，配置 `config/eeg_ws_transition_3way_gcn.yaml`。图注意力配置 `config/eeg_ws_transition_3way_gcn_attn.yaml`。两种都已评 test，数字在 `doc/results.md`。CNN 不加注意力的现有参数 val 也在那里；优化参数后的 CNN 还没跑。
+
+手选网络指标加分类器仍是单独一行对照，不接到这两条路上。验证集定下后评一次 test。数字只并进 `doc/results.md`。

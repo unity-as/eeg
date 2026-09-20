@@ -35,6 +35,10 @@ def build_recurrence_plot(
     return resize_square(rp, image_size)
 
 
+def preprocess_signal(arr: np.ndarray, method_cfg) -> np.ndarray:
+    return _preprocess(np.asarray(arr, dtype=np.float64), method_cfg)
+
+
 def _preprocess(arr: np.ndarray, method_cfg) -> np.ndarray:
     fs = method_cfg.get("sampling_rate", None)
     if fs is None:

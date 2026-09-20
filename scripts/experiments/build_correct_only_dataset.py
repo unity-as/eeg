@@ -37,6 +37,7 @@ from experiments.common import (
 )
 from representation.gpu_rp import build_rp_batch_gpu
 from representation.recurrence_plot import build_representation
+from representation.state_transition import fit_train_amplitude_edges, uses_train_edges
 from utils.io_utils import ensure_dir, load_json, save_json
 
 
@@ -219,6 +220,12 @@ def build_subject(subject: str, cfg, force: bool = False, overwrite_split: bool 
     skipped_bad_epoch = 0
 
     kind = _representation_kind(cfg)
+    train_edges = kind == "transition" and uses_train_edges(cfg.method)
+    if train_edges and str(cfg.method.get("normalize", "zscore")).lower() in ("zscore", "z", "std"):
+        raise RuntimeError(
+            "bin_scope=train_global uses shared amplitude bins; set method.normalize to none"
+        )
+    held_epochs: list[np.ndarray] = []
     rp_device = str(data_cfg.get("rp_device", "cuda"))
     rp_batch_size = int(data_cfg.get("rp_batch_size", 8))
     use_gpu = kind == "rp" and rp_device.startswith("cuda")
@@ -235,6 +242,16 @@ def build_subject(subject: str, cfg, force: bool = False, overwrite_split: bool 
 
     def flush_pending() -> None:
         if not pending_epochs:
+            return
+        if train_edges:
+            held_epochs.extend(pending_epochs)
+            ys.extend(int(label) for label in pending_labels)
+            for row in pending_rows:
+                sample_ids.append(str(row["sample_id"]))
+                event_rows.append(row)
+            pending_epochs.clear()
+            pending_labels.clear()
+            pending_rows.clear()
             return
         images = _encode_epochs(
             pending_epochs, cfg, use_gpu, rp_device, rp_batch_size
@@ -311,20 +328,48 @@ def build_subject(subject: str, cfg, force: bool = False, overwrite_split: bool 
             break
 
     flush_pending()
-    if not xs:
+    if train_edges and not held_epochs:
+        raise RuntimeError(f"{subject}: no samples after filtering")
+    if not train_edges and not xs:
         raise RuntimeError(f"{subject}: no samples after filtering")
 
-    X = np.stack(xs, axis=0)
-    if kind == "transition":
-        X = X.astype(np.float32)
+    if train_edges:
+        y = np.asarray(ys, dtype=np.int64)
+        split, split_path = _load_or_create_split(
+            subject, y, sample_ids, cfg, overwrite=overwrite_split
+        )
+        edges = fit_train_amplitude_edges(held_epochs, split["indices"]["train"], cfg.method)
+        enc_cfg = OmegaConf.merge(cfg, {"method": {"bin_edges": edges.tolist()}})
+        encoded = []
+        batch = max(int(rp_batch_size), 1)
+        for start in range(0, len(held_epochs), batch):
+            encoded.append(
+                _encode_epochs(
+                    held_epochs[start : start + batch],
+                    enc_cfg,
+                    False,
+                    rp_device,
+                    rp_batch_size,
+                )
+            )
+        X = np.concatenate(encoded, axis=0).astype(np.float32)
         if not np.isfinite(X).all():
             raise RuntimeError(f"{subject}: transition cache contains NaN or inf")
+        held_epochs.clear()
+        bin_edges = edges
     else:
-        X = X.astype(np.uint8)
-    y = np.asarray(ys, dtype=np.int64)
-    split, split_path = _load_or_create_split(
-        subject, y, sample_ids, cfg, overwrite=overwrite_split
-    )
+        X = np.stack(xs, axis=0)
+        if kind == "transition":
+            X = X.astype(np.float32)
+            if not np.isfinite(X).all():
+                raise RuntimeError(f"{subject}: transition cache contains NaN or inf")
+        else:
+            X = X.astype(np.uint8)
+        y = np.asarray(ys, dtype=np.int64)
+        split, split_path = _load_or_create_split(
+            subject, y, sample_ids, cfg, overwrite=overwrite_split
+        )
+        bin_edges = None
 
     out_dir = Path(ensure_dir(str(out_dir)))
     arrays = {}
@@ -354,6 +399,8 @@ def build_subject(subject: str, cfg, force: bool = False, overwrite_split: bool 
         "epoch_samples": int(data_cfg.epoch_samples),
         "representation": kind,
         "dtype": str(X.dtype),
+        "bin_scope": str(cfg.method.get("bin_scope", "per_epoch")),
+        "bin_edges": None if bin_edges is None else bin_edges.tolist(),
         "rp_device": rp_device if kind == "rp" else "cpu",
         "rp_batch_size": int(rp_batch_size),
         "class_counts": class_count_dict(y),

@@ -1,0 +1,75 @@
+{
+  "config": "config/eeg_ws_transition_3way_gcn.yaml",
+  "representation": "transition stack train_global",
+  "model": "relational GCN",
+  "seed": 42,
+  "seeds_included": [
+    42
+  ],
+  "n_subjects": 14,
+  "n_runs": 14,
+  "test_evaluated": false,
+  "ci_method": "t_0.975_df_n-1 * sample_std / sqrt(n)",
+  "overall_subject_mean_val_acc": 0.8580014376000316,
+  "overall_subject_std_val_acc": 0.03951052719631804,
+  "overall_val_ci95_low": 0.8351887383782994,
+  "overall_val_ci95_high": 0.8808141368217637,
+  "by_subject": [
+    {
+      "subject": "sub-002",
+      "acc": 0.9098360655737705
+    },
+    {
+      "subject": "sub-003",
+      "acc": 0.8482142857142857
+    },
+    {
+      "subject": "sub-004",
+      "acc": 0.8516483516483516
+    },
+    {
+      "subject": "sub-005",
+      "acc": 0.8397790055248618
+    },
+    {
+      "subject": "sub-006",
+      "acc": 0.8501362397820164
+    },
+    {
+      "subject": "sub-007",
+      "acc": 0.817174515235457
+    },
+    {
+      "subject": "sub-008",
+      "acc": 0.9111111111111111
+    },
+    {
+      "subject": "sub-009",
+      "acc": 0.7650273224043715
+    },
+    {
+      "subject": "sub-010",
+      "acc": 0.859504132231405
+    },
+    {
+      "subject": "sub-011",
+      "acc": 0.8888888888888888
+    },
+    {
+      "subject": "sub-012",
+      "acc": 0.8292682926829268
+    },
+    {
+      "subject": "sub-013",
+      "acc": 0.888283378746594
+    },
+    {
+      "subject": "sub-014",
+      "acc": 0.8598901098901099
+    },
+    {
+      "subject": "sub-015",
+      "acc": 0.8932584269662921
+    }
+  ]
+}
