@@ -34,6 +34,7 @@ def plot_confusion_matrix(
     class_names: Sequence[str],
     out_path: str,
     title: str = "Confusion matrix",
+    dpi: int = 300,
 ) -> None:
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     mat = np.asarray(cm, dtype=np.int64)
@@ -59,7 +60,7 @@ def plot_confusion_matrix(
                 color="white" if mat[i, j] > thresh else "black",
             )
     fig.tight_layout()
-    fig.savefig(out_path, dpi=120)
+    fig.savefig(out_path, dpi=dpi)
     plt.close(fig)
 
 
@@ -69,6 +70,7 @@ def plot_tsne(
     class_names: Sequence[str],
     out_path: str,
     title: str = "t-SNE",
+    dpi: int = 300,
 ) -> None:
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     labs = np.asarray(labels)
@@ -83,5 +85,5 @@ def plot_tsne(
     ax.set_title(title)
     ax.legend(frameon=False, fontsize=8)
     fig.tight_layout()
-    fig.savefig(out_path, dpi=120)
+    fig.savefig(out_path, dpi=dpi)
     plt.close(fig)

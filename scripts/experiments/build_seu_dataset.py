@@ -1,0 +1,172 @@
+"""Build SEU DDS windows as stacked transition matrices. Test stays sealed."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import sys
+from pathlib import Path
+
+import numpy as np
+from omegaconf import OmegaConf
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from data.seu_dds import (
+    CONDITIONS,
+    class_file,
+    class_names,
+    cut_windows,
+    load_seu_csv,
+    normalize_condition,
+    task_dir,
+    time_split_bounds,
+    vibration_xyz,
+    window_starts,
+)
+from experiments.train_runtime import resolve_path
+from representation.recurrence_plot import build_representation
+from representation.state_transition import fit_train_amplitude_edges, uses_train_edges
+from utils.io_utils import ensure_dir, save_json
+
+
+def class_count_dict(labels: np.ndarray, names: tuple[str, ...]) -> dict[str, int]:
+    values, counts = np.unique(labels, return_counts=True)
+    return {names[int(v)]: int(c) for v, c in zip(values, counts) if 0 <= int(v) < len(names)}
+
+
+def encode_windows(windows: list[np.ndarray], method_cfg) -> np.ndarray:
+    if not windows:
+        raise RuntimeError("no windows to encode")
+    maps = []
+    for win in windows:
+        arr, _ = build_representation(win, method_cfg)
+        maps.append(arr.astype(np.float32))
+    X = np.stack(maps, axis=0)
+    if not np.isfinite(X).all():
+        raise RuntimeError("transition cache contains NaN or inf")
+    return X
+
+
+def split_windows(xyz: np.ndarray, cfg) -> dict[str, list[np.ndarray]]:
+    n = int(xyz.shape[1])
+    length = int(cfg.data.epoch_samples)
+    stride = int(cfg.data.get("window_stride", length))
+    train_end, val_end = time_split_bounds(n, cfg.data.train_ratio, cfg.data.val_ratio)
+    max_per = cfg.data.get("max_windows_per_class")
+    out = {}
+    ranges = {
+        "train": (0, train_end),
+        "val": (train_end, val_end),
+        "test": (val_end, n),
+    }
+    for name, (lo, hi) in ranges.items():
+        starts = window_starts(lo, hi, length, stride)
+        if max_per is not None:
+            starts = starts[: int(max_per)]
+        out[name] = cut_windows(xyz, starts, length)
+    return out
+
+
+def build_condition(task: str, condition: str, cfg, force: bool) -> dict:
+    names = class_names(task)
+    raw_root = resolve_path(cfg.data.raw_root)
+    folder = task_dir(raw_root, task)
+    condition = normalize_condition(condition)
+    out_dir = resolve_path(cfg.data.output_root) / task / condition
+    meta_path = out_dir / "meta.json"
+    if meta_path.exists() and not force:
+        print(f"{task} {condition}: exists, skip (use --force to rebuild)")
+        return {"task": task, "condition": condition, "skipped": True}
+
+    method = cfg.method
+    if str(method.get("normalize", "none")).lower() in ("zscore", "z", "std"):
+        raise RuntimeError("SEU train_global bins need method.normalize=none")
+
+    by_split: dict[str, list[np.ndarray]] = {"train": [], "val": [], "test": []}
+    y_split: dict[str, list[int]] = {"train": [], "val": [], "test": []}
+    file_rows = {}
+    for label, name in enumerate(names):
+        path = folder / class_file(task, name, condition)
+        print(f"load {path.name}", flush=True)
+        raw = load_seu_csv(path)
+        xyz = vibration_xyz(raw)
+        file_rows[name] = int(xyz.shape[1])
+        parts = split_windows(xyz, cfg)
+        for split_name, windows in parts.items():
+            by_split[split_name].extend(windows)
+            y_split[split_name].extend([label] * len(windows))
+        print(
+            f"  {name}: n={xyz.shape[1]} "
+            f"train={len(parts['train'])} val={len(parts['val'])} test={len(parts['test'])}",
+            flush=True,
+        )
+
+    train_windows = by_split["train"]
+    edges = fit_train_amplitude_edges(train_windows, range(len(train_windows)), method)
+    enc_cfg = OmegaConf.merge(cfg, {"method": {"bin_edges": edges.tolist()}})
+
+    ensure_dir(str(out_dir))
+    arrays = {}
+    for split_name in ("train", "val", "test"):
+        X = encode_windows(by_split[split_name], enc_cfg.method)
+        y = np.asarray(y_split[split_name], dtype=np.int64)
+        np.save(out_dir / f"X_{split_name}.npy", X)
+        np.save(out_dir / f"y_{split_name}.npy", y)
+        arrays[split_name] = {"n": int(len(y)), "X_shape": list(X.shape), "y_shape": list(y.shape)}
+        print(f"{task} {condition} {split_name}: {X.shape}", flush=True)
+
+    fingerprint_src = "|".join(
+        f"{k}:{file_rows[k]}" for k in names
+    ) + f"|{condition}|{cfg.data.epoch_samples}|{cfg.data.get('window_stride', cfg.data.epoch_samples)}"
+    meta = {
+        "task": task,
+        "condition": condition,
+        "protocol": "seu_time_split",
+        "class_names": list(names),
+        "channels": [2, 3, 4],
+        "epoch_samples": int(cfg.data.epoch_samples),
+        "window_stride": int(cfg.data.get("window_stride", cfg.data.epoch_samples)),
+        "overlap": False,
+        "train_ratio": float(cfg.data.train_ratio),
+        "val_ratio": float(cfg.data.val_ratio),
+        "test_ratio": float(cfg.data.test_ratio),
+        "split_seed": int(cfg.data.split_seed),
+        "split_kind": "time_contiguous",
+        "file_length": file_rows,
+        "split_sample_id_fingerprint": hashlib.sha256(fingerprint_src.encode("utf-8")).hexdigest(),
+        "bin_scope": str(method.get("bin_scope", "train_global")),
+        "bin_edges": edges.tolist(),
+        "arrays": arrays,
+        "train_class_counts": class_count_dict(np.asarray(y_split["train"]), names),
+        "val_class_counts": class_count_dict(np.asarray(y_split["val"]), names),
+        "test_class_counts": class_count_dict(np.asarray(y_split["test"]), names),
+    }
+    save_json(meta, str(meta_path))
+    return meta
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Build SEU transition windows with a time split.")
+    parser.add_argument("--config", default="config/seu_bearing_cnn.yaml")
+    parser.add_argument("--task", default=None, help="bearing or gear")
+    parser.add_argument("--conditions", default=None, help="comma separated, e.g. 20_0,30_2")
+    parser.add_argument("--force", action="store_true")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    cfg = OmegaConf.load(resolve_path(args.config))
+    task = str(args.task or cfg.data.task)
+    if args.conditions:
+        conditions = [normalize_condition(c.strip()) for c in args.conditions.split(",") if c.strip()]
+    else:
+        conditions = [normalize_condition(c) for c in cfg.data.get("conditions", list(CONDITIONS))]
+    for condition in conditions:
+        build_condition(task, condition, cfg, force=bool(args.force))
+
+
+if __name__ == "__main__":
+    main()

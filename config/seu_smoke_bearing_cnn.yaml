@@ -1,0 +1,56 @@
+# 轴承 20-0 冒烟。少窗、少轮。test 封闭。
+method:
+  representation: transition
+  attention: none
+  rhythm_filter: false
+  rhythm_band: delta
+  quality_assess: false
+  normalize: none
+  sampling_rate: 5120
+  symbol_bins: 6
+  symbol_strategy: uniform
+  bin_scope: train_global
+  transition_steps: [1, 2, 3]
+  transition_weight: probability
+  transition_multichannel: stack
+  include_self_transition: true
+
+model:
+  arch: cnn
+  conv_channels: [32, 64]
+  fc_hidden: []
+  kernel_size: 3
+  pool_size: 2
+
+data:
+  source: seu_dds
+  task: bearing
+  raw_root: "./datas/seu"
+  output_root: "./datas/experiments_seu/smoke"
+  conditions: ["20_0"]
+  epoch_samples: 800
+  window_stride: 800
+  max_windows_per_class: 16
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  split_seed: 42
+
+train:
+  output_dir: "./datas/experiments_seu/smoke_ckpt"
+  checkpoint_name: "best_smoke.pt"
+  evaluate_test: false
+  batch_size: 16
+  epochs: 2
+  optimizer: adam
+  lr: 0.0005
+  weight_decay: 0.0001
+  dropout: 0.2
+  stop_on: val_acc
+  early_stop_patience: 30
+  num_workers: 0
+  device: "cuda"
+  deterministic: true
+  require_gpu: false
+  seed: 42
+  seeds: [42]

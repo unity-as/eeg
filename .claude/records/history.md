@@ -1,6 +1,11 @@
 # Changelog
 
-- CNN 与 GCN 合进 `feat/rotating-fault`，用配置切换。脑电冻在标签 `eeg-cnn`、`eeg-gcn`。
+## 2026-09-21
+
+- 验证集混淆矩阵和 t-SNE 接到 SEU 训练，论文图在 `doc/figures/seu/`。见 `doc/results.md`
+- `feat/rotating-fault` 去掉脑电分类入口，只留旋转机械。脑电在标签 `eeg-cnn`、`eeg-gcn`。
+
+- CNN 与 GCN 合进同一工程，用配置切换。脑电冻在标签 `eeg-cnn`、`eeg-gcn`。
 
 ## 2026-09-20
 

@@ -1,0 +1,58 @@
+# 东南大学 DDS 齿轮五分类。GCN。与 CNN 共用 representations。test 封闭。
+method:
+  representation: transition
+  attention: none
+  rhythm_filter: false
+  rhythm_band: delta
+  quality_assess: false
+  normalize: none
+  sampling_rate: 5120
+  symbol_bins: 6
+  symbol_strategy: uniform
+  bin_scope: train_global
+  transition_steps: [1, 2, 3]
+  transition_weight: probability
+  transition_multichannel: stack
+  include_self_transition: true
+
+model:
+  arch: gcn
+  gcn_layout: relational
+  gcn_steps: 3
+  gcn_hidden: 32
+  gcn_layers: 2
+  gcn_pool: flat
+  gcn_attention: false
+
+data:
+  source: seu_dds
+  task: gear
+  raw_root: "./datas/seu"
+  output_root: "./datas/experiments_seu/representations"
+  conditions: ["20_0", "30_2"]
+  epoch_samples: 800
+  window_stride: 800
+  max_windows_per_class: null
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  split_seed: 42
+
+train:
+  output_dir: "./datas/experiments_seu/checkpoints_gear_gcn"
+  checkpoint_name: "best_seu_gear_gcn.pt"
+  evaluate_test: false
+  batch_size: 32
+  epochs: 200
+  optimizer: adam
+  lr: 0.0005
+  weight_decay: 0.0001
+  dropout: 0.2
+  stop_on: val_acc
+  early_stop_patience: 30
+  num_workers: 0
+  device: "cuda"
+  deterministic: true
+  require_gpu: false
+  seed: 42
+  seeds: [42]

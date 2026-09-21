@@ -186,3 +186,9 @@ class TransitionGCN(nn.Module):
             )
         g = self._relational(adj) if self.layout == "relational" else self._independent(adj)
         return self.head(g)
+
+    def embed(self, adj: torch.Tensor) -> torch.Tensor:
+        """分类头之前的向量，供 t-SNE。"""
+        if adj.ndim != 4:
+            raise ValueError(f"GCN expects [B,K,N,N], got {tuple(adj.shape)}")
+        return self._relational(adj) if self.layout == "relational" else self._independent(adj)
