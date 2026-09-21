@@ -25,4 +25,5 @@
 | | max_windows_per_class | 冒烟截断；`null` 为全量 |
 | | train_ratio / val_ratio / test_ratio | 按时间切开，默认 0.70 / 0.15 / 0.15 |
 | train | device / require_gpu | `cuda` 可选；无 GPU 且 `require_gpu=false` 则走 CPU |
+| train | lr / dropout | 扫参网格见 `doc/method.md`。第一版为 0.0005 / 0.2 |
 | | seeds | 训练随机种子，与时间划分无关 |

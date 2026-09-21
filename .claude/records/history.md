@@ -2,6 +2,7 @@
 
 ## 2026-09-21
 
+- 四条线（CNN/GCN × 关/开注意力）在验证集扫学习率和 dropout。见 `doc/method.md`
 - 验证集混淆矩阵和 t-SNE 接到 SEU 训练，论文图在 `doc/figures/seu/`。见 `doc/results.md`
 - `feat/rotating-fault` 去掉脑电分类入口，只留旋转机械。脑电在标签 `eeg-cnn`、`eeg-gcn`。
 

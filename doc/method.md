@@ -19,6 +19,7 @@
 - 转移：步长 `[1,2,3]`，概率权重，三通道堆叠，输入 `[9,6,6]`
 - 训练种子默认 42。按 `val_acc` 早停
 - test 默认封闭。评测须同时加 `--evaluate-test --confirm-test`
+- 四条对照：CNN 关注意力 / CNN 自注意力 / GCN 关图注意力 / GCN 开图注意力。表示和划分冻第一版。各自扫学习率 `{1e-4, 5e-4, 1e-3}` 和 dropout `{0.1, 0.2, 0.3}`。选参看两工况 val 平均。扫参目录不覆盖第一版权重。
 
 ## 命令
 
@@ -36,6 +37,9 @@ python scripts/experiments/train_seu.py --config config/seu_gear_gcn.yaml
 
 # 已有权重出验证集混淆矩阵和 t-SNE，不打开测试集
 python scripts/experiments/plot_seu_val.py
+
+# 四条线扫 lr / dropout，只看 val
+python scripts/experiments/sweep_seu.py
 ```
 
 训练结束后也会把图写到 `doc/figures/seu/`。t-SNE 用分类头之前的向量。

@@ -53,7 +53,15 @@ def metrics_from_predictions(y_true: np.ndarray, y_pred: np.ndarray, prefix: str
     }
 
 
-def train_one(task: str, condition: str, seed: int, cfg, evaluate_test: bool, confirm_test: bool) -> dict:
+def train_one(
+    task: str,
+    condition: str,
+    seed: int,
+    cfg,
+    evaluate_test: bool,
+    confirm_test: bool,
+    write_paper_figures: bool = True,
+) -> dict:
     if evaluate_test and not confirm_test:
         raise RuntimeError("test evaluation requires --confirm-test after parameters are frozen")
 
@@ -158,21 +166,22 @@ def train_one(task: str, condition: str, seed: int, cfg, evaluate_test: bool, co
     _, _, val_true, val_pred = evaluate(model, val_loader, device, criterion, predictions=True)
     save_predictions(run_dir / "val_predictions.csv", val_true, val_pred)
     val_metrics = metrics_from_predictions(val_true, val_pred, "val", names)
-    title = paper_title(task, condition, method_name(cfg))
-    paper_dir = Path(ensure_dir(str(ROOT / "doc" / "figures" / "seu")))
-    figs = save_val_figures(
-        model,
-        val_loader,
-        device,
-        names,
-        val_metrics["val_confusion_matrix"],
-        run_dir,
-        title,
-        seed=seed,
-    )
-    stem = paper_stem(task, condition, method_name(cfg))
-    shutil.copy2(figs["val_confusion"], paper_dir / f"{stem}_confusion.png")
-    shutil.copy2(figs["val_tsne"], paper_dir / f"{stem}_tsne.png")
+    if write_paper_figures:
+        title = paper_title(task, condition, method_name(cfg))
+        paper_dir = Path(ensure_dir(str(ROOT / "doc" / "figures" / "seu")))
+        figs = save_val_figures(
+            model,
+            val_loader,
+            device,
+            names,
+            val_metrics["val_confusion_matrix"],
+            run_dir,
+            title,
+            seed=seed,
+        )
+        stem = paper_stem(task, condition, method_name(cfg))
+        shutil.copy2(figs["val_confusion"], paper_dir / f"{stem}_confusion.png")
+        shutil.copy2(figs["val_tsne"], paper_dir / f"{stem}_tsne.png")
 
     result = {
         "task": task,
