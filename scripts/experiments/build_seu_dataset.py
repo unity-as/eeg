@@ -27,7 +27,7 @@ from data.seu_dds import (
 )
 from experiments.train_runtime import resolve_path
 from representation.recurrence_plot import build_representation
-from representation.state_transition import fit_train_amplitude_edges, uses_train_edges
+from representation.state_transition import fit_train_edges, uses_train_edges
 from utils.io_utils import ensure_dir, save_json
 
 
@@ -81,8 +81,9 @@ def build_condition(task: str, condition: str, cfg, force: bool) -> dict:
         return {"task": task, "condition": condition, "skipped": True}
 
     method = cfg.method
-    if str(method.get("normalize", "none")).lower() in ("zscore", "z", "std"):
-        raise RuntimeError("SEU train_global bins need method.normalize=none")
+    # normalize=zscore is allowed: it is a per-window deterministic transform, so the
+    # train_global bin edges (fit after preprocessing) still map every sample to the
+    # same fixed state space. It only removes per-sample amplitude scale differences.
 
     by_split: dict[str, list[np.ndarray]] = {"train": [], "val": [], "test": []}
     y_split: dict[str, list[int]] = {"train": [], "val": [], "test": []}
@@ -104,7 +105,7 @@ def build_condition(task: str, condition: str, cfg, force: bool) -> dict:
         )
 
     train_windows = by_split["train"]
-    edges = fit_train_amplitude_edges(train_windows, range(len(train_windows)), method)
+    edges = fit_train_edges(train_windows, range(len(train_windows)), method)
     enc_cfg = OmegaConf.merge(cfg, {"method": {"bin_edges": edges.tolist()}})
 
     ensure_dir(str(out_dir))
@@ -137,6 +138,8 @@ def build_condition(task: str, condition: str, cfg, force: bool) -> dict:
         "file_length": file_rows,
         "split_sample_id_fingerprint": hashlib.sha256(fingerprint_src.encode("utf-8")).hexdigest(),
         "bin_scope": str(method.get("bin_scope", "train_global")),
+        "bin_edges_mode": str(method.get("bin_edges_mode", "quantile")),
+        "normalize": str(method.get("normalize", "none")),
         "bin_edges": edges.tolist(),
         "arrays": arrays,
         "train_class_counts": class_count_dict(np.asarray(y_split["train"]), names),
